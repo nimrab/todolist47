@@ -1,54 +1,77 @@
-import React from "react";
+import React, {ChangeEvent, useState} from "react";
 import {TaskType, FilterValuesType} from "./App";
-
-
+import {KeyboardEvent} from "react";
 
 type TodolistPropsType = {
     title: string
     tasks: Array<TaskType>
-    removeTask: (taskID: number) => void
+    removeTask: (taskID: string) => void
+    addTask: (title: string) => void
     changeFilter: (filter: FilterValuesType) => void
 
 }
 
-const Todolist:React.FC<TodolistPropsType> = (props) => {
+const Todolist: React.FC<TodolistPropsType> = (props) => {
 
-    const tasksJSXelements = props.tasks.map(el => {
+    const [title, setTitle] = useState<string>("") //local state
+
+    const tasksJsxElements = props.tasks.map(el => {
         return (
             //лучше задать(склеить) id самому, тк по умолчанию он возьмет индексы массива(а элементы потом удаляем, индесы не последовательные)
-        <li key={el.id}>
-            <input type="checkbox" checked={el.isDone}/>
-            <span>{el.title}</span>
-            <button onClick={() => props.removeTask(el.id)}>x</button>
-        </li>)
+            <li key={el.id}>
+                <input type="checkbox" checked={el.isDone}/>
+                <span>{el.title}</span>
+                <button onClick={() => props.removeTask(el.id)}>x</button>
+            </li>)
     });
 
+    const addTaskFn = () => {
+
+        title && props.addTask(title) //не даем пустую строку
+        setTitle("") //обнуляем поле ввода после энтера
+    }
+    const setFilterAll = () => props.changeFilter("all")
+    const setFilterActive = () => props.changeFilter("active")
+    const setFilterCompleted = () => props.changeFilter("completed")
+    const changeTitleByButton = (event: ChangeEvent<HTMLInputElement>) => {
+        setTitle(event.currentTarget.value)
+    }
+    const changeTitleByEnter = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key == "Enter") {
+            addTaskFn()
+        }
+    } //import from react!
+
+
 //UI:
-return (
-    <div className="todolist">
-        <div>
-            <h3>{props.title}</h3>
+    return (
+        <div className="todolist">
             <div>
-                <input/>
-                <button>+</button>
-            </div>
-            <ul>
-                {/*<li><input type="checkbox" checked={props.tasks[0].isDone}/> <span>{props.tasks[0].title}</span></li>*/}
-                {/*<li><input type="checkbox" checked={props.tasks[1].isDone}/> <span>{props.tasks[1].title}</span></li>*/}
-                {/*<li><input type="checkbox" checked={props.tasks[2].isDone}/> <span>{props.tasks[2].title}</span></li>*/}
+                <h3>{props.title}</h3>
+                <div>
+                    <input
+                        value={title} //будет раб и без присв в перем(полезно, когда обнов стр, а данные сохран)
+                        placeholder='Enter new task'
+                        onChange={changeTitleByButton}
+                        onKeyPress={changeTitleByEnter}
+                    />
 
+                    <button onClick={addTaskFn}>+</button>
 
-                {tasksJSXelements}
+                </div>
+                <ul>
 
-            </ul>
-            <div>
-                <button onClick={() => props.changeFilter("all")}>All</button>
-                <button onClick={() => props.changeFilter("active")}>Active</button>
-                <button onClick={() => props.changeFilter("completed")}>Completed</button>
+                    {tasksJsxElements}
+
+                </ul>
+                <div>
+                    <button onClick={setFilterAll}>All</button>
+                    <button onClick={setFilterActive}>Active</button>
+                    <button onClick={setFilterCompleted}>Completed</button>
+                </div>
             </div>
         </div>
-    </div>
-)
+    )
 
 }
 
