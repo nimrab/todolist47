@@ -9,6 +9,7 @@ type TodolistPropsType = {
     addTask: (title: string) => void
     changeFilter: (filter: FilterValuesType) => void
     filter: string
+    changeTaskStatus: (id: string, isDoneNewValue: boolean) => void
 
 }
 
@@ -20,7 +21,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
         return (
             //лучше задать(склеить) id самому, тк по умолчанию он возьмет индексы массива(а элементы потом удаляем, индесы не последовательные)
             <li key={el.id}>
-                <input type="checkbox" checked={el.isDone}/>
+                <input type="checkbox" checked={el.isDone} onChange={(event:ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked)}/>
                 <span>{el.title}</span>
                 <button onClick={() => props.removeTask(el.id)}>x</button>
             </li>)
@@ -35,8 +36,8 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
     const setFilterActive = () => props.changeFilter("active")
     const setFilterCompleted = () => props.changeFilter("completed")
 
-    const setActive = (value:string) => {
-               return props.filter === value ? "active-filter" : ""
+    const setActive = (value: string) => {
+        return props.filter === value ? "active-filter" : ""
     }
 
 
@@ -44,7 +45,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
         setTitle(event.currentTarget.value)
     }
     const changeTitleByEnter = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key == "Enter") {
+        if (event.key === "Enter") {
             addTaskFn()
         }
     } //import from react!
