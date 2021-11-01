@@ -8,6 +8,7 @@ type TodolistPropsType = {
     removeTask: (taskID: string) => void
     addTask: (title: string) => void
     changeFilter: (filter: FilterValuesType) => void
+    filter: string
 
 }
 
@@ -27,12 +28,18 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
 
     const addTaskFn = () => {
 
-        title && props.addTask(title) //не даем пустую строку
+        title && props.addTask(title.trim()) //не даем пустую строку
         setTitle("") //обнуляем поле ввода после энтера
     }
     const setFilterAll = () => props.changeFilter("all")
     const setFilterActive = () => props.changeFilter("active")
     const setFilterCompleted = () => props.changeFilter("completed")
+
+    const setActive = (value:string) => {
+               return props.filter === value ? "active-filter" : ""
+    }
+
+
     const changeTitleByButton = (event: ChangeEvent<HTMLInputElement>) => {
         setTitle(event.currentTarget.value)
     }
@@ -65,9 +72,9 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
 
                 </ul>
                 <div>
-                    <button onClick={setFilterAll}>All</button>
-                    <button onClick={setFilterActive}>Active</button>
-                    <button onClick={setFilterCompleted}>Completed</button>
+                    <button onClick={setFilterAll} className={setActive('all')}>All</button>
+                    <button onClick={setFilterActive} className={setActive('active')}>Active</button>
+                    <button onClick={setFilterCompleted} className={setActive('completed')}>Completed</button>
                 </div>
             </div>
         </div>
