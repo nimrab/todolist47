@@ -17,33 +17,52 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
 
     const [title, setTitle] = useState<string>("") //local state
 
+    const [error, setError] = useState<boolean>(false)
+
+
     const tasksJsxElements = props.tasks.map(el => {
         return (
             //лучше задать(склеить) id самому, тк по умолчанию он возьмет индексы массива(а элементы потом удаляем, индесы не последовательные)
-            <li key={el.id}>
-                <input type="checkbox" checked={el.isDone} onChange={(event:ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked)}/>
+            <li key={el.id} className={el.isDone ? "is-done" : ""}>
+                <input
+                    type="checkbox"
+                    checked={el.isDone}
+                    onChange={(event:ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked)}
+                />
                 <span>{el.title}</span>
                 <button onClick={() => props.removeTask(el.id)}>x</button>
             </li>)
     });
 
-    const addTaskFn = () => {
 
-        title && props.addTask(title.trim()) //не даем пустую строку
-        setTitle("") //обнуляем поле ввода после энтера
-    }
     const setFilterAll = () => props.changeFilter("all")
     const setFilterActive = () => props.changeFilter("active")
     const setFilterCompleted = () => props.changeFilter("completed")
-
     const setActive = (value: string) => {
         return props.filter === value ? "active-filter" : ""
     }
-
-
     const changeTitleByButton = (event: ChangeEvent<HTMLInputElement>) => {
+        setError(false)
         setTitle(event.currentTarget.value)
+
+
+
     }
+
+
+    const addTaskFn = () => {
+
+        const trimTitle = title.trim()
+        if(trimTitle) {
+            props.addTask(trimTitle) //не даем пустую строку
+            setTitle("") //обнуляем поле ввода после энтера
+        } else {
+            setError(true)
+        }
+        setTitle("")
+    }
+
+
     const changeTitleByEnter = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
             addTaskFn()
@@ -62,6 +81,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                         placeholder='Enter new task'
                         onChange={changeTitleByButton}
                         onKeyPress={changeTitleByEnter}
+                        className={error ? "error" : ""}
                     />
 
                     <button onClick={addTaskFn}>+</button>
