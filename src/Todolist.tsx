@@ -2,14 +2,16 @@ import React, {ChangeEvent, useState} from "react";
 import {TaskType, FilterValuesType} from "./App";
 import {KeyboardEvent} from "react";
 
-type TodolistPropsType = {
+export type TodolistPropsType = {
+    id: string
     title: string
     tasks: Array<TaskType>
-    removeTask: (taskID: string) => void
-    addTask: (title: string) => void
-    changeFilter: (filter: FilterValuesType) => void
+    removeTask: (taskID: string, todolist_Id: string) => void
+    addTask: (title: string, todolist_Id: string) => void
+    changeFilter: (filter: FilterValuesType, todolist_Id: string) => void
     filter: string
-    changeTaskStatus: (id: string, isDoneNewValue: boolean) => void
+    changeTaskStatus: (id: string, isDoneNewValue: boolean, todolist_Id: string) => void
+    removeTodolist: (todolist_Id: string) => void
 
 }
 
@@ -27,40 +29,43 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                 <input
                     type="checkbox"
                     checked={el.isDone}
-                    onChange={(event:ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked, props.id)}
                 />
                 <span>{el.title}</span>
-                <button onClick={() => props.removeTask(el.id)}>x</button>
+                <button onClick={() => props.removeTask(el.id, props.id)}>x</button>
             </li>)
     });
 
 
-    const setFilterAll = () => props.changeFilter("all")
-    const setFilterActive = () => props.changeFilter("active")
-    const setFilterCompleted = () => props.changeFilter("completed")
+    const setFilterAll = () => props.changeFilter("all", props.id)
+    const setFilterActive = () => props.changeFilter("active", props.id)
+    const setFilterCompleted = () => props.changeFilter("completed", props.id)
     const setActive = (value: string) => {
         return props.filter === value ? "active-filter" : ""
     }
     const changeTitleByButton = (event: ChangeEvent<HTMLInputElement>) => {
         setError(false)
         setTitle(event.currentTarget.value)
-
-
-
     }
+    const removeTodolist = () => props.removeTodolist(props.id)
 
 
     const addTaskFn = () => {
 
         const trimTitle = title.trim()
-        if(trimTitle) {
-            props.addTask(trimTitle) //не даем пустую строку
+        if (trimTitle) {
+            props.addTask(trimTitle, props.id) //не даем пустую строку
             setTitle("") //обнуляем поле ввода после энтера
         } else {
             setError(true)
         }
         setTitle("")
     }
+
+
+    const errorMessage = error
+        ? <div style={{color: "red"}}>Title is required!</div>
+        : null
 
 
     const changeTitleByEnter = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -74,7 +79,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
     return (
         <div className="todolist">
             <div>
-                <h3>{props.title}</h3>
+                <h3>{props.title} <button onClick={removeTodolist}>X</button></h3>
                 <div>
                     <input
                         value={title} //будет раб и без присв в перем(полезно, когда обнов стр, а данные сохран)
@@ -83,8 +88,8 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                         onKeyPress={changeTitleByEnter}
                         className={error ? "error" : ""}
                     />
-
                     <button onClick={addTaskFn}>+</button>
+                    {errorMessage}
 
                 </div>
                 <ul>
