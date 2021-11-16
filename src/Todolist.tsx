@@ -1,6 +1,8 @@
 import React, {ChangeEvent, useState} from "react";
 import {TaskType, FilterValuesType} from "./App";
 import {KeyboardEvent} from "react";
+import {AddItemForm} from "./AddItemForm/AddItemForm";
+import {EditableSpan} from "./EditableSpan/EditableSpan";
 
 export type TodolistPropsType = {
     id: string
@@ -12,17 +14,20 @@ export type TodolistPropsType = {
     filter: string
     changeTaskStatus: (id: string, isDoneNewValue: boolean, todolist_Id: string) => void
     removeTodolist: (todolist_Id: string) => void
+    changeTaskTitle: (id: string, title: string, todolist_Id: string) => void
+    changeTodolistTitle: (title:string, todolist_Id: string) => void
 
 }
 
 const Todolist: React.FC<TodolistPropsType> = (props) => {
 
-    const [title, setTitle] = useState<string>("") //local state
-
-    const [error, setError] = useState<boolean>(false)
-
 
     const tasksJsxElements = props.tasks.map(el => {
+
+        const changeTitle_Map = (title:string) => {
+            props.changeTaskTitle(el.id, title, props.id)
+        }
+
         return (
             //лучше задать(склеить) id самому, тк по умолчанию он возьмет индексы массива(а элементы потом удаляем, индесы не последовательные)
             <li key={el.id} className={el.isDone ? "is-done" : ""}>
@@ -31,7 +36,12 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                     checked={el.isDone}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked, props.id)}
                 />
-                <span>{el.title}</span>
+
+                <EditableSpan
+                    title={el.title}
+                    changeTitle={changeTitle_Map}
+                />
+
                 <button onClick={() => props.removeTask(el.id, props.id)}>x</button>
             </li>)
     });
@@ -43,55 +53,35 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
     const setActive = (value: string) => {
         return props.filter === value ? "active-filter" : ""
     }
-    const changeTitleByButton = (event: ChangeEvent<HTMLInputElement>) => {
-        setError(false)
-        setTitle(event.currentTarget.value)
-    }
     const removeTodolist = () => props.removeTodolist(props.id)
-
-
-    const addTaskFn = () => {
-
-        const trimTitle = title.trim()
-        if (trimTitle) {
-            props.addTask(trimTitle, props.id) //не даем пустую строку
-            setTitle("") //обнуляем поле ввода после энтера
-        } else {
-            setError(true)
-        }
-        setTitle("")
+    const addTaskFn = (title: string) => {
+        props.addTask(title, props.id) //не даем пустую строку
+    }
+    const changeTitle = (title:string) => {
+        props.changeTodolistTitle(title, props.id)
     }
 
-
-    const errorMessage = error
-        ? <div style={{color: "red"}}>Title is required!</div>
-        : null
-
-
-    const changeTitleByEnter = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter") {
-            addTaskFn()
-        }
-    } //import from react!
 
 
 //UI:
     return (
         <div className="todolist">
             <div>
-                <h3>{props.title} <button onClick={removeTodolist}>X</button></h3>
-                <div>
-                    <input
-                        value={title} //будет раб и без присв в перем(полезно, когда обнов стр, а данные сохран)
-                        placeholder='Enter new task'
-                        onChange={changeTitleByButton}
-                        onKeyPress={changeTitleByEnter}
-                        className={error ? "error" : ""}
+                <h3>
+                    <EditableSpan
+                        title={props.title}
+                        changeTitle={changeTitle}
                     />
-                    <button onClick={addTaskFn}>+</button>
-                    {errorMessage}
 
-                </div>
+                    <button onClick={removeTodolist}>X</button>
+                </h3>
+
+
+                <AddItemForm
+                    addItem={addTaskFn}
+
+                />
+
                 <ul>
 
                     {tasksJsxElements}
