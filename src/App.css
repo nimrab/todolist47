@@ -1,26 +1,35 @@
-.App {
-    padding: 30px;
-    display: flex;
-}
+/*.App {*/
+/*    padding: 30px;*/
+/*    display: flex;*/
+/*}*/
 
-.App > div {
-    margin-right: 50px;
-}
+/*.App > div {*/
+/*    margin-right: 50px;*/
+/*}*/
 
-.todolist {
-    outline: 1px solid lightgray;
-    border-radius: 5px;
-    padding: 20px;
-}
+/*.todolist {*/
+/*    outline: 1px solid lightgray;*/
+/*    border-radius: 5px;*/
+/*    padding: 20px;*/
+/*    min-width: 270px;*/
+/*}*/
 
-.active-filter {
-    background-color: khaki;
-}
+/*.active-filter {*/
+/*    background-color: khaki;*/
+/*}*/
 
 .is-done {
     opacity: 0.5;
 }
 
-.error {
-    outline: 1px solid red;
-}
+/*.error {*/
+/*    outline: 1px solid red;*/
+/*}*/
+/*.input_field {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*}*/
+
+/*.add_todolist_input {*/
+/*    min-width: 220px;*/
+/*}*/

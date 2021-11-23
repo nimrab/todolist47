@@ -3,6 +3,8 @@ import {TaskType, FilterValuesType} from "./App";
 import {KeyboardEvent} from "react";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
+import {Button, ButtonGroup, Checkbox, Icon, IconButton, List, ListItem, Typography} from "@material-ui/core";
+import {Delete} from "@material-ui/icons";
 
 export type TodolistPropsType = {
     id: string
@@ -15,7 +17,7 @@ export type TodolistPropsType = {
     changeTaskStatus: (id: string, isDoneNewValue: boolean, todolist_Id: string) => void
     removeTodolist: (todolist_Id: string) => void
     changeTaskTitle: (id: string, title: string, todolist_Id: string) => void
-    changeTodolistTitle: (title:string, todolist_Id: string) => void
+    changeTodolistTitle: (title: string, todolist_Id: string) => void
 
 }
 
@@ -24,18 +26,23 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
 
     const tasksJsxElements = props.tasks.map(el => {
 
-        const changeTitle_Map = (title:string) => {
+        const changeTitle_Map = (title: string) => {
             props.changeTaskTitle(el.id, title, props.id)
         }
 
         return (
             //лучше задать(склеить) id самому, тк по умолчанию он возьмет индексы массива(а элементы потом удаляем, индесы не последовательные)
-            <li key={el.id} className={el.isDone ? "is-done" : ""}>
-                <input
-                    type="checkbox"
+            <ListItem
+                key={el.id}
+                className={el.isDone ? "is-done" : ""}
+                disableGutters={true}
+            >
+                <Checkbox
+                    color={'primary'}
                     checked={el.isDone}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked, props.id)}
                 />
+
 
                 <EditableSpan
                     title={el.title}
@@ -43,7 +50,11 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                 />
 
                 <button onClick={() => props.removeTask(el.id, props.id)}>x</button>
-            </li>)
+
+                <ButtonGroup onClick={() => props.removeTask(el.id, props.id)}>
+                    <Delete fontSize={'small'}></Delete>
+                </ButtonGroup>
+            </ListItem>)
     });
 
 
@@ -57,24 +68,26 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
     const addTaskFn = (title: string) => {
         props.addTask(title, props.id) //не даем пустую строку
     }
-    const changeTitle = (title:string) => {
+    const changeTitle = (title: string) => {
         props.changeTodolistTitle(title, props.id)
-    }
 
+    }
 
 
 //UI:
     return (
         <div className="todolist">
             <div>
-                <h3>
+                <Typography variant={"h6"} style={{fontWeight: 'bold'}}>
                     <EditableSpan
                         title={props.title}
                         changeTitle={changeTitle}
                     />
 
-                    <button onClick={removeTodolist}>X</button>
-                </h3>
+                    <IconButton onClick={removeTodolist}>
+                        <Delete/>
+                    </IconButton>
+                </Typography>
 
 
                 <AddItemForm
@@ -82,15 +95,24 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
 
                 />
 
-                <ul>
+                <List>
 
                     {tasksJsxElements}
 
-                </ul>
+                </List>
                 <div>
-                    <button onClick={setFilterAll} className={setActive('all')}>All</button>
-                    <button onClick={setFilterActive} className={setActive('active')}>Active</button>
-                    <button onClick={setFilterCompleted} className={setActive('completed')}>Completed</button>
+                    <ButtonGroup
+                        variant={"contained"}
+                        size={"small"}
+                        disableElevation={true}
+                    >
+                        <Button onClick={setFilterAll}
+                                color={props.filter === 'all' ? 'secondary' : 'primary'}>All</Button>
+                        <Button onClick={setFilterActive}
+                                color={props.filter === 'active' ? 'secondary' : 'primary'}>Active</Button>
+                        <Button onClick={setFilterCompleted}
+                                color={props.filter === 'completed' ? 'secondary' : 'primary'}>Completed</Button>
+                    </ButtonGroup>
                 </div>
             </div>
         </div>

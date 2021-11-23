@@ -1,4 +1,6 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from "react";
+import {Fab, IconButton, TextField} from "@material-ui/core";
+import AddBoxIcon from "@material-ui/icons/AddBox";
 
 
 export type AddItemFormPropsType = {
@@ -42,19 +44,21 @@ export const AddItemForm = (props: AddItemFormPropsType) => {
 
     return (
 
-        <div>
+        <div className={'input_field'}>
 
-
-            <input
+            <TextField
+                variant={'outlined'}
+                size={'small'}
                 value={title} //будет раб и без присв в перем(полезно, когда обнов стр, а данные сохран)
                 placeholder='Enter new item'
                 onChange={changeTitleByButton}
                 onKeyPress={changeTitleByEnter}
-                className={error ? "error" : ""}
+                error={!!error}
             />
 
-
-            <button onClick={addItemFn}>+</button>
+            <IconButton onClick={addItemFn}>
+                <AddBoxIcon fontSize={'large'}></AddBoxIcon>
+            </IconButton>
             {errorMessage}
 
 
