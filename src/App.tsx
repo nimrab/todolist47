@@ -14,7 +14,7 @@ export type TaskType = {
     isDone: boolean
 }
 
-type TodolistType = {
+export type TodolistType = {
     id: string
     title: string
     filter: FilterValuesType
@@ -57,17 +57,6 @@ function App() {
 
     })
 
-    //Business Logic Level (BLL)
-    // let [task, setTasks] = useState<Array<TaskType>>(
-    //     [
-    //         {id: v1(), title: "HTML", isDone: true},
-    //         {id: v1(), title: "CSS", isDone: false},
-    //         {id: v1(), title: "React", isDone: false},
-    //         {id: v1(), title: "Vue", isDone: true},
-    //         {id: v1(), title: "Graph", isDone: false},
-    //     ]
-    // )
-
 
     const [filter, setFilter] = useState<FilterValuesType>("all")
 
@@ -107,7 +96,6 @@ function App() {
         setTodoLists(todoLists.filter(el => el.id !== todolist_Id))
         delete task[todolist_Id]
     }
-
     const addTodolist = (title: string) => {
         setTodoLists([...todoLists, {id: v1(), title: title, filter: 'all'}])
 
@@ -120,11 +108,9 @@ function App() {
         setTodoLists([...todoLists, newTodoList])
         setTasks({...task, [todoListID]: []})
     }
-
     const changeTodolistTitle = (title: string, todolist_Id: string) => {
         setTodoLists(todoLists.map(el => el.id === todolist_Id ? {...el, title} : el))
     }
-
     const changeTaskTitle = (id: string, title: string, todolist_Id: string) => {
         setTasks({...task, [todolist_Id]: task[todolist_Id].map(el => el.id === id ? {...el, title: title} : el)})
     }
