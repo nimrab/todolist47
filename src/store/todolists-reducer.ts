@@ -1,15 +1,15 @@
 import {FilterValuesType, TodolistType} from "../App";
 import {v1} from "uuid";
 
-type RemoveTodoListAT = {
+export type RemoveTodoListAT = {
     type: 'REMOVE-TODOLIST'
-    id: string
+    todoListId: string
 }
 
-type AddTodoListAT = {
+export type AddTodoListAT = {
     type: 'ADD-TODOLIST',
     title: string
-    id: string
+    todoListID: string
 }
 
 type ChangeTodoListTitleAT = {
@@ -32,11 +32,11 @@ export const todolistsReducer = (todoLists: Array<TodolistType>, action: ActionT
     switch (action.type) {
 
         case 'REMOVE-TODOLIST':
-            return todoLists.filter(el => el.id !== action.id)
+            return todoLists.filter(el => el.id !== action.todoListId)
 
         case 'ADD-TODOLIST':
             const newTodoList: TodolistType = {
-                id: action.id,
+                id: action.todoListID,
                 title: action.title,
                 filter: "all"
             }
@@ -54,17 +54,17 @@ export const todolistsReducer = (todoLists: Array<TodolistType>, action: ActionT
 
 }
 
-export const RemoveTodoListAC = (id: string): RemoveTodoListAT => {
-    return {type: 'REMOVE-TODOLIST', id: id}
+export const RemoveTodoListAC = (todoListId: string): RemoveTodoListAT => {
+    return {type: 'REMOVE-TODOLIST', todoListId} as const
 }
 
 
-export const AddTodoListAC = (title: string, id: string): AddTodoListAT => {
+export const AddTodoListAC = (title: string): AddTodoListAT => {
     return {
         type: 'ADD-TODOLIST',
         title: title,
-        id: id
-    }
+        todoListID: v1()
+    } as const
 }
 
 export const ChangeTodoListTitleAC = (title: string, id: string): ChangeTodoListTitleAT => {
@@ -72,7 +72,7 @@ export const ChangeTodoListTitleAC = (title: string, id: string): ChangeTodoList
         type: 'CHANGE-TODOLIST-TITLE',
         title: title,
         id: id
-    }
+    } as const
 }
 
 
@@ -81,7 +81,7 @@ export const ChangeTodoListFilterAC = (filter: FilterValuesType, id: string): Ch
         type: 'CHANGE-TODOLIST-FILTER',
         filter: filter,
         id: id
-    }
+    } as const
 }
 
 

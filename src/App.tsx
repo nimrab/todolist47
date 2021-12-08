@@ -20,7 +20,7 @@ export type TodolistType = {
     filter: FilterValuesType
 }
 
-type TaskStateType = {
+export type TaskStateType = {
     [key: string]: Array<TaskType>
 }
 
@@ -54,7 +54,6 @@ function App() {
             {id: v1(), title: "Whiskey", isDone: true},
             {id: v1(), title: "Bread", isDone: false},
         ],
-
     })
 
 
