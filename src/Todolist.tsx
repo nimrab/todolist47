@@ -49,7 +49,6 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                     changeTitle={changeTitle_Map}
                 />
 
-                <button onClick={() => props.removeTask(el.id, props.id)}>x</button>
 
                 <ButtonGroup onClick={() => props.removeTask(el.id, props.id)}>
                     <Delete fontSize={'small'}></Delete>
@@ -104,7 +103,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                     <ButtonGroup
                         variant={"contained"}
                         size={"small"}
-                        disableElevation={true}
+                        // disableElevation={true}
                     >
                         <Button onClick={setFilterAll}
                                 color={props.filter === 'all' ? 'secondary' : 'primary'}>All</Button>

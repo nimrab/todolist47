@@ -167,7 +167,7 @@ function App() {
             </AppBar>
 
 
-            <Container fixed={true} style={{marginTop:'75px'}}>
+            <Container fixed={true} style={{marginTop: '75px'}}>
 
                 <Grid container style={{padding: '29px 0'}}>
                     <div className={'add_todolist_input'}>

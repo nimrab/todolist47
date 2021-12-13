@@ -25,10 +25,10 @@
 /*.error {*/
 /*    outline: 1px solid red;*/
 /*}*/
-/*.input_field {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*}*/
+.input_field {
+    display: flex;
+    align-items: center;
+}
 
 /*.add_todolist_input {*/
 /*    min-width: 220px;*/
