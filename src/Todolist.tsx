@@ -1,10 +1,12 @@
 import React, {ChangeEvent, useState} from "react";
-import {TaskType, FilterValuesType} from "./App";
+import {TaskType, FilterValuesType, TodolistType, TaskStateType} from "./App";
 import {KeyboardEvent} from "react";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
 import {Button, ButtonGroup, Checkbox, Icon, IconButton, List, ListItem, Typography} from "@material-ui/core";
 import {Delete} from "@material-ui/icons";
+import {useSelector} from "react-redux";
+import {AppRootStateType} from "./store/store";
 
 export type TodolistPropsType = {
     id: string
@@ -23,6 +25,10 @@ export type TodolistPropsType = {
 
 const Todolist: React.FC<TodolistPropsType> = (props) => {
 
+    const todoList = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todoLists.filter(el => el.id === props.id))
+    const tasks = useSelector<AppRootStateType, TaskStateType>(state => state.tasks[props.id])
+
+    //+перенести все методы из App
 
     const tasksJsxElements = props.tasks.map(el => {
 
