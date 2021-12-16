@@ -46,8 +46,7 @@ function App() {
             <Grid item key={el.id}>
                 <Paper elevation={5} style={{padding: '10px 10px 10px 10px'}}>
                     <Todolist
-                        key={el.id}
-                        id={el.id}
+                        todoList={el}
                     />
                 </Paper>
             </Grid>
@@ -80,10 +79,10 @@ function App() {
 
                 </Grid>
 
-                <Grid container spacing={4}>
+             <Grid container spacing={4}>
                     {todolistsComponents}
-                </Grid>
-            </Container>
+              </Grid>
+               </Container>
 
         </div>
     )

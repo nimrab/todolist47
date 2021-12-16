@@ -10,22 +10,22 @@ import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "./
 import {ChangeTodoListFilterAC, ChangeTodoListTitleAC, RemoveTodoListAC} from "./store/todolists-reducer";
 
 export type TodolistPropsType = {
-    id: string
+    todoList: TodolistType
 }
 
 
 const Todolist: React.FC<TodolistPropsType> = (props) => {
 
-    const todoList = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todoLists.filter(el => el.id === props.id))
-    const tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[props.id])
+    //const todoList = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todoLists.filter(el => el.id === props.id))
+    const tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[props.todoList.id])
     const dispatch = useDispatch()
 
 
     let tasksForRender = tasks
-    if (todoList[0].filter === "active") {
+    if (props.todoList.filter === "active") {
         tasksForRender = tasks.filter(el => !el.isDone)
     }
-    if (todoList[0].filter === "completed") {
+    if (props.todoList.filter === "completed") {
         tasksForRender = tasks.filter(el => el.isDone)
     }
 
@@ -33,7 +33,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
     const tasksJsxElements = tasksForRender.map(el => {
 
         const changeTitle_Map = (title: string) => {
-            dispatch(changeTaskTitleAC(el.id, title, props.id))
+            dispatch(changeTaskTitleAC(el.id, title, props.todoList.id))
         }
 
         return (
@@ -42,10 +42,11 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                 className={el.isDone ? "is-done" : ""}
                 disableGutters={true}
             >
+
                 <Checkbox
                     color={'primary'}
                     checked={el.isDone}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => dispatch(changeTaskStatusAC(el.id, event.currentTarget.checked, props.id))}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => dispatch(changeTaskStatusAC(el.id, event.currentTarget.checked, props.todoList.id))}
                 />
 
 
@@ -55,23 +56,25 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                 />
 
 
-                <ButtonGroup onClick={() => dispatch(removeTaskAC(el.id, props.id))}>
-                    <Delete fontSize={'small'}></Delete>
-                </ButtonGroup>
+                <IconButton onClick={() => dispatch(removeTaskAC(el.id, props.todoList.id))}>
+                        <Delete fontSize={'small'}/>
+                </IconButton>
+
+
             </ListItem>)
     });
 
 
-    const setFilterAll = () => dispatch(ChangeTodoListFilterAC("all", props.id))
-    const setFilterActive = () => dispatch(ChangeTodoListFilterAC("active", props.id))
-    const setFilterCompleted = () => dispatch(ChangeTodoListFilterAC("completed", props.id))
+    const setFilterAll = () => dispatch(ChangeTodoListFilterAC("all", props.todoList.id))
+    const setFilterActive = () => dispatch(ChangeTodoListFilterAC("active", props.todoList.id))
+    const setFilterCompleted = () => dispatch(ChangeTodoListFilterAC("completed", props.todoList.id))
 
-    const removeTodolist = () => dispatch(RemoveTodoListAC(props.id))
+    const removeTodolist = () => dispatch(RemoveTodoListAC(props.todoList.id))
     const addTaskFn = (title: string) => {
-        dispatch(addTaskAC(title, props.id))
+        dispatch(addTaskAC(title, props.todoList.id))
     }
     const changeTitle = (title: string) => {
-        dispatch(ChangeTodoListTitleAC(title, props.id))
+        dispatch(ChangeTodoListTitleAC(title, props.todoList.id))
     }
 
 
@@ -81,7 +84,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
             <div>
                 <Typography variant={"h6"} style={{fontWeight: 'bold'}}>
                     <EditableSpan
-                        title={todoList[0].title}
+                        title={props.todoList.title}
                         changeTitle={changeTitle}
                     />
 
@@ -108,11 +111,11 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                         disableElevation={true}
                     >
                         <Button onClick={setFilterAll}
-                                color={todoList[0].filter === 'all' ? 'secondary' : 'primary'}>All</Button>
+                                color={props.todoList.filter === 'all' ? 'secondary' : 'primary'}>All</Button>
                         <Button onClick={setFilterActive}
-                                color={todoList[0].filter === 'active' ? 'secondary' : 'primary'}>Active</Button>
+                                color={props.todoList.filter === 'active' ? 'secondary' : 'primary'}>Active</Button>
                         <Button onClick={setFilterCompleted}
-                                color={todoList[0].filter === 'completed' ? 'secondary' : 'primary'}>Completed</Button>
+                                color={props.todoList.filter === 'completed' ? 'secondary' : 'primary'}>Completed</Button>
                     </ButtonGroup>
                 </div>
             </div>
