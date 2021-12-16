@@ -1,43 +1,42 @@
-import React, {ChangeEvent, useState} from "react";
-import {TaskType, FilterValuesType, TodolistType, TaskStateType} from "./App";
-import {KeyboardEvent} from "react";
+import React, {ChangeEvent} from "react";
+import {TaskType, TodolistType} from "./App";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
-import {Button, ButtonGroup, Checkbox, Icon, IconButton, List, ListItem, Typography} from "@material-ui/core";
+import {Button, ButtonGroup, Checkbox, IconButton, List, ListItem, Typography} from "@material-ui/core";
 import {Delete} from "@material-ui/icons";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./store/store";
+import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "./store/tasks-reducer";
+import {ChangeTodoListFilterAC, ChangeTodoListTitleAC, RemoveTodoListAC} from "./store/todolists-reducer";
 
 export type TodolistPropsType = {
     id: string
-    title: string
-    tasks: Array<TaskType>
-    removeTask: (taskID: string, todolist_Id: string) => void
-    addTask: (title: string, todolist_Id: string) => void
-    changeFilter: (filter: FilterValuesType, todolist_Id: string) => void
-    filter: string
-    changeTaskStatus: (id: string, isDoneNewValue: boolean, todolist_Id: string) => void
-    removeTodolist: (todolist_Id: string) => void
-    changeTaskTitle: (id: string, title: string, todolist_Id: string) => void
-    changeTodolistTitle: (title: string, todolist_Id: string) => void
-
 }
+
 
 const Todolist: React.FC<TodolistPropsType> = (props) => {
 
     const todoList = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todoLists.filter(el => el.id === props.id))
-    const tasks = useSelector<AppRootStateType, TaskStateType>(state => state.tasks[props.id])
+    const tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[props.id])
+    const dispatch = useDispatch()
 
-    //+перенести все методы из App
 
-    const tasksJsxElements = props.tasks.map(el => {
+    let tasksForRender = tasks
+    if (todoList[0].filter === "active") {
+        tasksForRender = tasks.filter(el => !el.isDone)
+    }
+    if (todoList[0].filter === "completed") {
+        tasksForRender = tasks.filter(el => el.isDone)
+    }
+
+
+    const tasksJsxElements = tasksForRender.map(el => {
 
         const changeTitle_Map = (title: string) => {
-            props.changeTaskTitle(el.id, title, props.id)
+            dispatch(changeTaskTitleAC(el.id, title, props.id))
         }
 
         return (
-            //лучше задать(склеить) id самому, тк по умолчанию он возьмет индексы массива(а элементы потом удаляем, индесы не последовательные)
             <ListItem
                 key={el.id}
                 className={el.isDone ? "is-done" : ""}
@@ -46,7 +45,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                 <Checkbox
                     color={'primary'}
                     checked={el.isDone}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(el.id, event.currentTarget.checked, props.id)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => dispatch(changeTaskStatusAC(el.id, event.currentTarget.checked, props.id))}
                 />
 
 
@@ -56,26 +55,23 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                 />
 
 
-                <ButtonGroup onClick={() => props.removeTask(el.id, props.id)}>
+                <ButtonGroup onClick={() => dispatch(removeTaskAC(el.id, props.id))}>
                     <Delete fontSize={'small'}></Delete>
                 </ButtonGroup>
             </ListItem>)
     });
 
 
-    const setFilterAll = () => props.changeFilter("all", props.id)
-    const setFilterActive = () => props.changeFilter("active", props.id)
-    const setFilterCompleted = () => props.changeFilter("completed", props.id)
-    const setActive = (value: string) => {
-        return props.filter === value ? "active-filter" : ""
-    }
-    const removeTodolist = () => props.removeTodolist(props.id)
+    const setFilterAll = () => dispatch(ChangeTodoListFilterAC("all", props.id))
+    const setFilterActive = () => dispatch(ChangeTodoListFilterAC("active", props.id))
+    const setFilterCompleted = () => dispatch(ChangeTodoListFilterAC("completed", props.id))
+
+    const removeTodolist = () => dispatch(RemoveTodoListAC(props.id))
     const addTaskFn = (title: string) => {
-        props.addTask(title, props.id) //не даем пустую строку
+        dispatch(addTaskAC(title, props.id))
     }
     const changeTitle = (title: string) => {
-        props.changeTodolistTitle(title, props.id)
-
+        dispatch(ChangeTodoListTitleAC(title, props.id))
     }
 
 
@@ -85,7 +81,7 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
             <div>
                 <Typography variant={"h6"} style={{fontWeight: 'bold'}}>
                     <EditableSpan
-                        title={props.title}
+                        title={todoList[0].title}
                         changeTitle={changeTitle}
                     />
 
@@ -109,14 +105,14 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
                     <ButtonGroup
                         variant={"contained"}
                         size={"small"}
-                        // disableElevation={true}
+                        disableElevation={true}
                     >
                         <Button onClick={setFilterAll}
-                                color={props.filter === 'all' ? 'secondary' : 'primary'}>All</Button>
+                                color={todoList[0].filter === 'all' ? 'secondary' : 'primary'}>All</Button>
                         <Button onClick={setFilterActive}
-                                color={props.filter === 'active' ? 'secondary' : 'primary'}>Active</Button>
+                                color={todoList[0].filter === 'active' ? 'secondary' : 'primary'}>Active</Button>
                         <Button onClick={setFilterCompleted}
-                                color={props.filter === 'completed' ? 'secondary' : 'primary'}>Completed</Button>
+                                color={todoList[0].filter === 'completed' ? 'secondary' : 'primary'}>Completed</Button>
                     </ButtonGroup>
                 </div>
             </div>
