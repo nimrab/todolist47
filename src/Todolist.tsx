@@ -1,24 +1,28 @@
-import React, {ChangeEvent} from "react";
+import React, {useCallback} from "react";
 import {TaskType, TodolistType} from "./App";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
-import {Button, ButtonGroup, Checkbox, IconButton, List, ListItem, Typography} from "@material-ui/core";
+import {Button, ButtonGroup, IconButton, List, Typography} from "@material-ui/core";
 import {Delete} from "@material-ui/icons";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./store/store";
-import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "./store/tasks-reducer";
+import {addTaskAC} from "./store/tasks-reducer";
 import {ChangeTodoListFilterAC, ChangeTodoListTitleAC, RemoveTodoListAC} from "./store/todolists-reducer";
+import {Task} from "./Task";
 
 export type TodolistPropsType = {
     todoList: TodolistType
 }
 
 
-const Todolist: React.FC<TodolistPropsType> = (props) => {
-
-    //const todoList = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todoLists.filter(el => el.id === props.id))
+const Todolist: React.FC<TodolistPropsType> = React.memo((props) => {
+    console.log('Todolist rendered')
     const tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[props.todoList.id])
     const dispatch = useDispatch()
+
+    //будет все равно перерисовывать, если берем целый стейт!
+    //надо в Task вызвать useSelector для конкретной Task
+    //state => state.tasks[todoListid].filter(el=> el.id === taskID)[0]) .где TaskID приходит через пропсы
 
 
     let tasksForRender = tasks
@@ -30,52 +34,19 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
     }
 
 
-    const tasksJsxElements = tasksForRender.map(el => {
-
-        const changeTitle_Map = (title: string) => {
-            dispatch(changeTaskTitleAC(el.id, title, props.todoList.id))
-        }
-
-        return (
-            <ListItem
-                key={el.id}
-                className={el.isDone ? "is-done" : ""}
-                disableGutters={true}
-            >
-
-                <Checkbox
-                    color={'primary'}
-                    checked={el.isDone}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => dispatch(changeTaskStatusAC(el.id, event.currentTarget.checked, props.todoList.id))}
-                />
-
-
-                <EditableSpan
-                    title={el.title}
-                    changeTitle={changeTitle_Map}
-                />
-
-
-                <IconButton onClick={() => dispatch(removeTaskAC(el.id, props.todoList.id))}>
-                        <Delete fontSize={'small'}/>
-                </IconButton>
-
-
-            </ListItem>)
-    });
-
-
     const setFilterAll = () => dispatch(ChangeTodoListFilterAC("all", props.todoList.id))
     const setFilterActive = () => dispatch(ChangeTodoListFilterAC("active", props.todoList.id))
     const setFilterCompleted = () => dispatch(ChangeTodoListFilterAC("completed", props.todoList.id))
 
     const removeTodolist = () => dispatch(RemoveTodoListAC(props.todoList.id))
-    const addTaskFn = (title: string) => {
+
+    const addTaskFn = useCallback((title: string) => {
         dispatch(addTaskAC(title, props.todoList.id))
-    }
-    const changeTitle = (title: string) => {
+    }, [dispatch, props.todoList.id])
+
+    const changeTitle = useCallback((title: string) => {
         dispatch(ChangeTodoListTitleAC(title, props.todoList.id))
-    }
+    },[dispatch, props.todoList.id])
 
 
 //UI:
@@ -101,7 +72,14 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
 
                 <List>
 
-                    {tasksJsxElements}
+                    {tasksForRender.map(el => {
+                        return (
+                        <Task
+                            key={el.id}
+                            task={el}
+                            todoListId={props.todoList.id}
+                        />)
+                    })}
 
                 </List>
                 <div>
@@ -122,6 +100,6 @@ const Todolist: React.FC<TodolistPropsType> = (props) => {
         </div>
     )
 
-}
+})
 
 export default Todolist;
