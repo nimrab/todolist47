@@ -15,14 +15,14 @@ type TaskPropsType = {
 export const Task = React.memo((props: TaskPropsType) => {
 
     const {todoListId, task} = props
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
 
 
-    console.log(`Task rendered`)
+    console.log(`Task ${props.task.id}rendered`)
 
     const changeTitle_Map = useCallback((title: string) => {
         dispatch(changeTaskTitleAC(task.id, title, todoListId))
-    },[dispatch,task.id,todoListId])
+    }, [dispatch, task.id, todoListId])
 
     return (
         <ListItem
