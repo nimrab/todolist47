@@ -18,7 +18,7 @@ export type TodolistPropsType = {
 const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPropsType) => {
 
 
-    console.log(`Todolist ${todoList.id} rendered`)
+    console.log(`Todolist ID: ${todoList.id} rendered`)
     const tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[todoList.id])
     const dispatch = useDispatch()
 
@@ -58,7 +58,7 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
     }, [dispatch, todoList.id])
 
 
-//UI:
+
     return (
         <div className="todolist">
             <div>

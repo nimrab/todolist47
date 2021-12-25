@@ -18,11 +18,15 @@ export const Task = React.memo((props: TaskPropsType) => {
     const dispatch = useDispatch()
 
 
-    console.log(`Task ${props.task.id}rendered`)
+    console.log(`Task ID: ${props.task.id} rendered`)
 
-    const changeTitle_Map = useCallback((title: string) => {
+    const changeTaskTitle = (title: string) => {
         dispatch(changeTaskTitleAC(task.id, title, todoListId))
-    }, [dispatch, task.id, todoListId])
+    }
+
+    // const changeTitle_Map = useCallback((title: string) => {
+    //     dispatch(changeTaskTitleAC(task.id, title, todoListId))
+    // }, [dispatch, task.id, todoListId])
 
     return (
         <ListItem
@@ -39,7 +43,7 @@ export const Task = React.memo((props: TaskPropsType) => {
 
             <EditableSpan
                 title={task.title}
-                changeTitle={changeTitle_Map}
+                changeTitle={changeTaskTitle}
             />
 
 
