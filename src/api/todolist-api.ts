@@ -1,44 +1,72 @@
 import axios from "axios";
 
+const instance = axios.create({
+    baseURL: 'https://social-network.samuraijs.com/api/1.1',
+    withCredentials: true,
+    headers: {
+        'api-key': '7be99c63-5a64-429e-83a0-e1cc010cb04c'
+    }
+})
+
+type TodoType = {
+    id: string
+    title: string
+    addedDate: string
+    order: number
+}
+/*
+type CreateTodoType = {
+    data: {
+        item: TodoType
+    }
+    fieldsErrors: Array<string>
+    messages: Array<string>
+    resultCode: number
+}
+
+
+type DeleteTodoType = {
+    data: {}
+    fieldsErrors: Array<string>
+    messages: Array<string>
+    resultCode: number
+}
+
+type DeleteAndUpdateTodoType = {
+    data: {}
+    fieldsErrors: Array<string>
+    messages: Array<string>
+    resultCode: number
+}*/
+
+type ResponseType<T> = {
+    fieldsErrors: Array<string>
+    messages: Array<string>
+    resultCode: number
+    data: T
+}
+
 
 export const todolistApi = {
 
-    settings: {
-        headers: {
-            'api-key': '7be99c63-5a64-429e-83a0-e1cc010cb04c'
-        }
-    },
-
     getTodos() {
-        let promise = axios.get('https://social-network.samuraijs.com/api/1.1/todo-lists', {
-            withCredentials: true
-        })
-        return promise
+        return instance.get<Array<TodoType>>('/todo-lists')
     },
 
     createTodo() {
-
         const title = 'NewTodoList'
-
-
-        let promise = axios.post('https://social-network.samuraijs.com/api/1.1/todo-lists',
-            {title}, this.settings)
-        return promise
+        return instance.post<'',ResponseType<{item: TodoType}>, {title: string}>('/todo-lists', {title})
+        //выше дополнительно типизирыем передаваемые значения title (редко используется)
     },
 
     deleteTodo() {
         const todolistId = '';
-
-        let promise = axios.delete(`https://social-network.samuraijs.com/api/1.1/todo-lists/${todolistId}`, this.settings)
-        return promise
+        return instance.delete<ResponseType<{}>>(`/todo-lists/${todolistId}`)
     },
 
     updateTodoTitle() {
-
         const todolistId = ''
-        let promise = axios.put(`https://social-network.samuraijs.com/api/1.1/todo-lists/${todolistId}`, {title: 'REACT>>>>>>>>>'}, this.settings)
-
-        return promise
+        return instance.put<ResponseType<{}>>(`/todo-lists/${todolistId}`, {title: 'REACT>>>>>>>>>'})
     },
 
 
