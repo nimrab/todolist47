@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
-//import './App.css'
+import './App.css'
 import Todolist from "./Todolist";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {AppBar, Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@material-ui/core";
@@ -37,21 +37,30 @@ function App() {
     useEffect(() => {
 
         todolistApi.getTodos()
-            .then(res=> {
+            .then(res => {
                 res.data.forEach(el => {
                     dispatch(AddTodoListAC(el.title, el.id))
                 })
 
             })
 
-    },[])
-
-
+    }, [])
 
 
     const addTodolist = useCallback((title: string) => {
-        //dispatch(AddTodoListAC(title))
-    },[dispatch])
+
+        todolistApi.createTodo(title)
+            .then(res => {
+                if (res.data.resultCode === 0) {
+                    dispatch(AddTodoListAC(title, res.data.data.item.id))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+
+    }, [dispatch])
 
     const todoListsComponents = todoLists.map(el => {
 
@@ -93,10 +102,10 @@ function App() {
 
                 </Grid>
 
-             <Grid container spacing={4}>
+                <Grid container spacing={4}>
                     {todoListsComponents}
-              </Grid>
-               </Container>
+                </Grid>
+            </Container>
 
         </div>
     )

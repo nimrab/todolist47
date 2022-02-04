@@ -13,21 +13,21 @@ export type ActionType =
 
 
 const initialState: TaskStateType = {
-  /*  [todolistId_1]: [
-        {id: v1(), title: "HTML", isDone: true},
-        {id: v1(), title: "CSS", isDone: false},
-        {id: v1(), title: "JS", isDone: false},
-        {id: v1(), title: "React", isDone: true},
-        {id: v1(), title: "TypeScript", isDone: true},
-        {id: v1(), title: "GraphQL", isDone: false},
-    ],
-    [todolistId_2]: [
-        {id: v1(), title: "Meat", isDone: true},
-        {id: v1(), title: "Pasta", isDone: true},
-        {id: v1(), title: "Coca-Cola", isDone: false},
-        {id: v1(), title: "Whiskey", isDone: true},
-        {id: v1(), title: "Bread", isDone: false},
-    ],*/
+    /*  [todolistId_1]: [
+          {id: v1(), title: "HTML", isDone: true},
+          {id: v1(), title: "CSS", isDone: false},
+          {id: v1(), title: "JS", isDone: false},
+          {id: v1(), title: "React", isDone: true},
+          {id: v1(), title: "TypeScript", isDone: true},
+          {id: v1(), title: "GraphQL", isDone: false},
+      ],
+      [todolistId_2]: [
+          {id: v1(), title: "Meat", isDone: true},
+          {id: v1(), title: "Pasta", isDone: true},
+          {id: v1(), title: "Coca-Cola", isDone: false},
+          {id: v1(), title: "Whiskey", isDone: true},
+          {id: v1(), title: "Bread", isDone: false},
+      ],*/
 }
 
 
@@ -39,7 +39,7 @@ export const taskReducer = (state: TaskStateType = initialState, action: ActionT
             return {...state, [action.todoListId]: state[action.todoListId].filter(el => el.id !== action.taskId)}
 
         case 'ADD-TASK':
-            const newTask = {id: v1(), title: action.taskTitle, isDone: false}
+            const newTask = {id: action.taskId, title: action.taskTitle, isDone: action.isDone}
 
             return {...state, [action.todoListId]: [newTask, ...state[action.todoListId]]}
 
@@ -83,8 +83,10 @@ type RemoveTaskACType = {
 
 type AddTaskACType = {
     type: 'ADD-TASK'
+    taskId: string
     taskTitle: string
     todoListId: string
+    isDone: boolean
 }
 
 type ChangeTaskStatusACType = {
@@ -109,11 +111,13 @@ export const removeTaskAC = (taskId: string, todoListId: string): RemoveTaskACTy
     }
 }
 
-export const addTaskAC = (taskTitle: string, todoListId: string): AddTaskACType => {
+export const addTaskAC = (taskTitle: string, todoListId: string, taskId: string, isDone: boolean): AddTaskACType => {
     return {
         type: 'ADD-TASK',
         taskTitle,
-        todoListId
+        todoListId,
+        isDone,
+        taskId
     }
 }
 

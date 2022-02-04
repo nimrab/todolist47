@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useEffect} from "react";
 import {TaskType, TodolistType} from "./App";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
@@ -9,6 +9,8 @@ import {AppRootStateType} from "./store/store";
 import {addTaskAC} from "./store/tasks-reducer";
 import {ChangeTodoListFilterAC, ChangeTodoListTitleAC, RemoveTodoListAC} from "./store/todolists-reducer";
 import {Task} from "./Task";
+import {todolistApi} from "./api/todolist-api";
+import {taskApi} from "./api/task-api";
 
 export type TodolistPropsType = {
     todoList: TodolistType
@@ -25,6 +27,19 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
     //будет все равно перерисовывать, если берем целый стейт!
     //надо в Task вызвать useSelector для конкретной Task
     //state => state.tasks[todoListid].filter(el=> el.id === taskID)[0]) .где TaskID приходит через пропсы
+
+    useEffect(() => {
+
+        taskApi.getTasks(todoList.id)
+            .then(res => {
+                if (res.data.error === null) {
+                    res.data.items.forEach(el => {
+                        dispatch(addTaskAC(el.title, todoList.id, el.id, el.completed))
+                    })
+                }
+            })
+
+    },[])
 
 
     let tasksForRender = tasks
@@ -48,13 +63,41 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
         dispatch(ChangeTodoListFilterAC("completed", todoList.id))
     }, [dispatch, todoList.id])
 
-    const removeTodolist = () => dispatch(RemoveTodoListAC(todoList.id))
+    const removeTodolist = () => {
+        todolistApi.deleteTodo(todoList.id)
+            .then(res => {
+                if (res.data.resultCode === 0) {
+                    dispatch(RemoveTodoListAC(todoList.id))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+    }
 
     const addTaskFn = useCallback((title: string) => {
-        dispatch(addTaskAC(title, todoList.id))
+
+        taskApi.addTask(todoList.id, title)
+            .then(res=> {
+                if (res.data.resultCode === 0) {
+                    dispatch(addTaskAC(title, todoList.id, res.data.data.item.id, false))
+                }
+            })
+
+
     }, [dispatch, todoList.id])
     const changeTitle = useCallback((title: string) => {
-        dispatch(ChangeTodoListTitleAC(title, todoList.id))
+        todolistApi.editTodo(title, todoList.id)
+            .then(res=> {
+                if (res.data.resultCode === 0) {
+                    dispatch(ChangeTodoListTitleAC(title, todoList.id))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
     }, [dispatch, todoList.id])
 
 

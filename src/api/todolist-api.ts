@@ -1,4 +1,4 @@
-import axios, {Axios, AxiosResponse} from 'axios'
+import axios from 'axios'
 
 
 const instance = axios.create({
@@ -14,13 +14,22 @@ export const todolistApi = {
 
     getTodos() {
         return instance.get<Array<TodoType>>(`todo-lists`)
+    },
+
+    createTodo(title: string) {
+        return instance.post<ResponseType<{item: TodoType}>>(`todo-lists`, {title})
+    },
+
+    deleteTodo(id: string) {
+        return instance.delete<ResponseType<{}>>(`todo-lists/${id}`)
+    },
+
+    editTodo( title: string, id: string) {
+        return instance.put<ResponseType<{}>>(`todo-lists/${id}`, {title})
     }
 
 
-
 }
-
-
 
 
 type TodoType = {
@@ -28,4 +37,12 @@ type TodoType = {
     id: string
     order: number
     title: string
+}
+
+type ResponseType<T> = {
+    resultCode: number
+    messages: string[]
+    fieldsErrors: string[]
+    data: T
+
 }
