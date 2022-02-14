@@ -1,6 +1,7 @@
 import {TaskStateType} from "../App";
-import {v1} from "uuid";
-import {AddTodoListAT, RemoveTodoListAT, todolistId_1, todolistId_2} from "./todolists-reducer";
+import {AddTodoListAT, RemoveTodoListAT} from "./todolists-reducer";
+import {Dispatch} from "redux";
+import {taskApi} from "../api/task-api";
 
 
 export type ActionType =
@@ -139,3 +140,65 @@ export const changeTaskTitleAC = (taskId: string, taskTitle: string, todoListId:
     }
 }
 
+export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
+
+    taskApi.getTasks(todoListId)
+        .then(res => {
+            if (res.data.error === null) {
+                res.data.items.forEach(el => {
+                    const status = !!el.status
+                    dispatch(addTaskAC(el.title, todoListId, el.id, status))
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+
+
+export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispatch) => {
+    taskApi.addTask(todoListId, title)
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(addTaskAC(title, todoListId, res.data.data.item.id, false))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+export const changeTaskTitleTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
+    taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(changeTaskTitleAC(taskId, title, todoListId))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+export const changeTaskStatusTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
+    taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(changeTaskStatusAC(taskId, taskStatus, todoListId))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+export const removeTaskStatusTC = (taskId: string, todoListId: string,) => (dispatch: Dispatch) => {
+    taskApi.deleteTask(todoListId, taskId)
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(removeTaskAC(taskId, todoListId))
+            }
+        })
+}

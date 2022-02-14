@@ -6,11 +6,9 @@ import {Button, ButtonGroup, IconButton, List, Typography} from "@material-ui/co
 import {Delete} from "@material-ui/icons";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./store/store";
-import {addTaskAC} from "./store/tasks-reducer";
-import {ChangeTodoListFilterAC, ChangeTodoListTitleAC, RemoveTodoListAC} from "./store/todolists-reducer";
+import {addTaskTC, getTasksTC} from "./store/tasks-reducer";
+import {changeTodoListFilterAC, changeTodoListTitleTC, deleteTodoListTC} from "./store/todolists-reducer";
 import {Task} from "./Task";
-import {todolistApi} from "./api/todolist-api";
-import {taskApi} from "./api/task-api";
 
 export type TodolistPropsType = {
     todoList: TodolistType
@@ -29,17 +27,8 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
     //state => state.tasks[todoListid].filter(el=> el.id === taskID)[0]) .где TaskID приходит через пропсы
 
     useEffect(() => {
-
-        taskApi.getTasks(todoList.id)
-            .then(res => {
-                if (res.data.error === null) {
-                    res.data.items.forEach(el => {
-                        dispatch(addTaskAC(el.title, todoList.id, el.id, el.completed))
-                    })
-                }
-            })
-
-    },[])
+        dispatch(getTasksTC(todoList.id))
+    }, [])
 
 
     let tasksForRender = tasks
@@ -52,54 +41,27 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
 
 
     const setFilterAll = useCallback(() => {
-        dispatch(ChangeTodoListFilterAC("all", todoList.id))
+        dispatch(changeTodoListFilterAC("all", todoList.id))
     }, [dispatch, todoList.id])
 
     const setFilterActive = useCallback(() => {
-        dispatch(ChangeTodoListFilterAC("active", todoList.id))
+        dispatch(changeTodoListFilterAC("active", todoList.id))
     }, [dispatch, todoList.id])
 
     const setFilterCompleted = useCallback(() => {
-        dispatch(ChangeTodoListFilterAC("completed", todoList.id))
+        dispatch(changeTodoListFilterAC("completed", todoList.id))
     }, [dispatch, todoList.id])
 
     const removeTodolist = () => {
-        todolistApi.deleteTodo(todoList.id)
-            .then(res => {
-                if (res.data.resultCode === 0) {
-                    dispatch(RemoveTodoListAC(todoList.id))
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
+        dispatch(deleteTodoListTC(todoList.id))
     }
 
     const addTaskFn = useCallback((title: string) => {
-
-        taskApi.addTask(todoList.id, title)
-            .then(res=> {
-                if (res.data.resultCode === 0) {
-                    dispatch(addTaskAC(title, todoList.id, res.data.data.item.id, false))
-                }
-            })
-
-
+        dispatch(addTaskTC(todoList.id, title))
     }, [dispatch, todoList.id])
     const changeTitle = useCallback((title: string) => {
-        todolistApi.editTodo(title, todoList.id)
-            .then(res=> {
-                if (res.data.resultCode === 0) {
-                    dispatch(ChangeTodoListTitleAC(title, todoList.id))
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
+       dispatch(changeTodoListTitleTC(title, todoList.id))
     }, [dispatch, todoList.id])
-
 
 
     return (

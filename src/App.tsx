@@ -4,10 +4,9 @@ import Todolist from "./Todolist";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {AppBar, Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@material-ui/core";
 import {Menu} from "@material-ui/icons";
-import {AddTodoListAC} from "./store/todolists-reducer";
+import {addTodoListTC, getTodoListTC} from "./store/todolists-reducer";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./store/store";
-import {todolistApi} from "./api/todolist-api";
 
 
 export type TaskType = {
@@ -15,17 +14,14 @@ export type TaskType = {
     title: string
     isDone: boolean
 }
-
 export type TodolistType = {
     id: string
     title: string
     filter: FilterValuesType
 }
-
 export type TaskStateType = {
     [key: string]: Array<TaskType>
 }
-
 export type FilterValuesType = "all" | "active" | "completed"
 
 
@@ -35,36 +31,15 @@ function App() {
     const todoLists = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todoLists)
 
     useEffect(() => {
-
-        todolistApi.getTodos()
-            .then(res => {
-                res.data.forEach(el => {
-                    dispatch(AddTodoListAC(el.title, el.id))
-                })
-
-            })
-
+        dispatch(getTodoListTC())
     }, [])
 
 
     const addTodolist = useCallback((title: string) => {
-
-        todolistApi.createTodo(title)
-            .then(res => {
-                if (res.data.resultCode === 0) {
-                    dispatch(AddTodoListAC(title, res.data.data.item.id))
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-
+        dispatch(addTodoListTC(title))
     }, [dispatch])
 
     const todoListsComponents = todoLists.map(el => {
-
-
         return (
             <Grid item key={el.id}>
                 <Paper elevation={5} style={{padding: '10px 10px 10px 10px'}}>

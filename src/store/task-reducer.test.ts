@@ -1,6 +1,6 @@
 import {TaskStateType} from "../App";
 import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC, taskReducer} from "./tasks-reducer";
-import {AddTodoListAC, RemoveTodoListAC} from "./todolists-reducer";
+import {addTodoListAC, removeTodoListAC} from "./todolists-reducer";
 import {v1} from "uuid";
 
 
@@ -88,7 +88,7 @@ test('title of specified task should be changed', () => {
 test('new array should be added when new todolist is added', () => {
 
 
-    const action = AddTodoListAC("new todolist", v1());
+    const action = addTodoListAC("new todolist", v1());
 
     const endState = taskReducer(startState, action)
 
@@ -105,7 +105,7 @@ test('new array should be added when new todolist is added', () => {
 
 test('property with todolistId should be deleted', () => {
 
-    const action = RemoveTodoListAC("todolistId2");
+    const action = removeTodoListAC("todolistId2");
 
     const endState = taskReducer(startState, action)
 

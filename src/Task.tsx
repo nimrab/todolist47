@@ -1,11 +1,10 @@
 import React, {ChangeEvent} from 'react';
 import {Checkbox, IconButton, ListItem} from "@material-ui/core";
-import {changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "./store/tasks-reducer";
+import {changeTaskStatusTC, changeTaskTitleTC, removeTaskStatusTC} from "./store/tasks-reducer";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
 import {Delete} from "@material-ui/icons";
 import {TaskType} from "./App";
 import {useDispatch} from "react-redux";
-import {taskApi} from "./api/task-api";
 
 type TaskPropsType = {
     todoListId: string
@@ -22,38 +21,15 @@ export const Task = React.memo((props: TaskPropsType) => {
     console.log(`Task ID: ${props.task.id} rendered`)
 
     const changeTaskTitle = (title: string) => {
-        taskApi.editTaskTitleOrStatus(todoListId, task.id, title, task.isDone)
-            .then(res => {
-                if (res.data.resultCode === 0) {
-                    dispatch(changeTaskTitleAC(task.id, title, todoListId))
-                }
-            })
-
+        dispatch(changeTaskTitleTC(todoListId, task.id, title, task.isDone))
     }
-
     const changeTaskStatus = (isDone: boolean) => {
-        taskApi.editTaskTitleOrStatus(todoListId, task.id, task.title, isDone)
-            .then(res => {
-                if (res.data.resultCode === 0) {
-                    dispatch(changeTaskStatusAC(task.id, isDone, todoListId))
-                }
-            })
+        dispatch(changeTaskStatusTC(todoListId, task.id, task.title, isDone))
     }
-
     const removeTask = (taskId: string, todoListId: string) => {
-
-        taskApi.deleteTask(todoListId, task.id)
-            .then(res => {
-                if (res.data.resultCode === 0) {
-                    dispatch(removeTaskAC(task.id, todoListId))
-                }
-            })
+        dispatch(removeTaskStatusTC(todoListId, task.id))
     }
 
-
-    // const changeTitle_Map = useCallback((title: string) => {
-    //     dispatch(changeTaskTitleAC(task.id, title, todoListId))
-    // }, [dispatch, task.id, todoListId])
 
     return (
         <ListItem
@@ -80,5 +56,5 @@ export const Task = React.memo((props: TaskPropsType) => {
 
 
         </ListItem>
-    );
+    )
 })
