@@ -1,7 +1,9 @@
 import {TaskStateType} from "../App";
-import {AddTodoListAT, RemoveTodoListAT} from "./todolists-reducer";
+import {AddTodoListAT, RemoveTodoListAT, statusCode} from "./todolists-reducer";
 import {Dispatch} from "redux";
 import {taskApi} from "../api/task-api";
+import {changeStatusAC} from "./app-reducer";
+import {handleServerAppError} from "../utils/error-utils";
 
 
 export type ActionType =
@@ -141,64 +143,91 @@ export const changeTaskTitleAC = (taskId: string, taskTitle: string, todoListId:
 }
 
 export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
-
+    dispatch(changeStatusAC('loading'))
     taskApi.getTasks(todoListId)
         .then(res => {
-            if (res.data.error === null) {
-                res.data.items.forEach(el => {
-                    const status = !!el.status
-                    dispatch(addTaskAC(el.title, todoListId, el.id, status))
-                })
-            }
+            res.data.items.forEach(el => {
+                const status = !!el.status
+                dispatch(addTaskAC(el.title, todoListId, el.id, status))
+            })
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }
 
 
-
 export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     taskApi.addTask(todoListId, title)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(addTaskAC(title, todoListId, res.data.data.item.id, false))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }
 
 export const changeTaskTitleTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(changeTaskTitleAC(taskId, title, todoListId))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }
 
 export const changeTaskStatusTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(changeTaskStatusAC(taskId, taskStatus, todoListId))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }
 
 export const removeTaskStatusTC = (taskId: string, todoListId: string,) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     taskApi.deleteTask(todoListId, taskId)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(removeTaskAC(taskId, todoListId))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
+        })
+        .catch(err => {
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }

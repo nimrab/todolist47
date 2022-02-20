@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect} from "react";
-import {TaskType, TodolistType} from "./App";
+import {TaskType} from "./App";
 import {AddItemForm} from "./AddItemForm/AddItemForm";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
 import {Button, ButtonGroup, IconButton, List, Typography} from "@material-ui/core";
@@ -7,11 +7,16 @@ import {Delete} from "@material-ui/icons";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./store/store";
 import {addTaskTC, getTasksTC} from "./store/tasks-reducer";
-import {changeTodoListFilterAC, changeTodoListTitleTC, deleteTodoListTC} from "./store/todolists-reducer";
+import {
+    changeTodoListFilterAC,
+    changeTodoListTitleTC,
+    deleteTodoListTC,
+    TodolistDomainType
+} from "./store/todolists-reducer";
 import {Task} from "./Task";
 
 export type TodolistPropsType = {
-    todoList: TodolistType
+    todoList: TodolistDomainType
 }
 
 

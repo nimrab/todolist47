@@ -2,6 +2,8 @@ import {FilterValuesType, TodolistType} from "../App";
 import {v1} from "uuid";
 import {Dispatch} from "redux";
 import {todolistApi} from "../api/todolist-api";
+import {changeStatusAC} from "./app-reducer";
+import {handleServerAppError} from "../utils/error-utils";
 
 export type RemoveTodoListAT = {
     type: 'REMOVE-TODOLIST'
@@ -25,19 +27,30 @@ type ChangeTodoListFilterAT = {
     filter: FilterValuesType
     id: string
 }
+
+
 export const todolistId_1 = v1()
 export const todolistId_2 = v1()
 
 
-const initialState: Array<TodolistType> = [
+const initialState: Array<TodolistDomainType> = [
     /*{id: todolistId_1, title: 'What to learn', filter: 'all'},
     {id: todolistId_2, title: 'What to eat', filter: 'all'},*/
 ]
 
 
+export const statusCode = {
+    success: 0,
+    error: 1
+}
+
+export type TodolistDomainType = TodolistType & {
+    filter: FilterValuesType
+}
+
 export type ActionType = RemoveTodoListAT | AddTodoListAT | ChangeTodoListTitleAT | ChangeTodoListFilterAT
 
-export const todolistsReducer = (todoLists: Array<TodolistType> = initialState, action: ActionType): Array<TodolistType> => {
+export const todolistsReducer = (todoLists: Array<TodolistDomainType> = initialState, action: ActionType): Array<TodolistDomainType> => {
 
     switch (action.type) {
 
@@ -45,7 +58,7 @@ export const todolistsReducer = (todoLists: Array<TodolistType> = initialState, 
             return todoLists.filter(el => el.id !== action.todoListId)
 
         case 'ADD-TODOLIST':
-            const newTodoList: TodolistType = {
+            const newTodoList: TodolistDomainType = {
                 id: action.todoListId,
                 title: action.title,
                 filter: "all"
@@ -96,51 +109,73 @@ export const changeTodoListFilterAC = (filter: FilterValuesType, id: string): Ch
 }
 
 export const getTodoListTC = () => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     todolistApi.getTodos()
         .then(res => {
-            res.data.forEach(el => {
+            res.data.reverse().forEach(el => {
                 dispatch(addTodoListAC(el.title, el.id))
             })
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
         })
-
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
+        })
 }
 
 export const addTodoListTC = (title: string) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     todolistApi.createTodo(title)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(addTodoListAC(title, res.data.data.item.id))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }
 
 export const changeTodoListTitleTC = (title: string, todoListId: string) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     todolistApi.editTodo(title, todoListId)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(changeTodoListTitleAC(title, todoListId))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
         })
-
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
+        })
 }
 
 export const deleteTodoListTC = (todoListId: string) => (dispatch: Dispatch) => {
+    dispatch(changeStatusAC('loading'))
     todolistApi.deleteTodo(todoListId)
         .then(res => {
-            if (res.data.resultCode === 0) {
+            if (res.data.resultCode === statusCode.success) {
                 dispatch(removeTodoListAC(todoListId))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
         })
         .catch(err => {
-            console.log(err)
+            handleServerAppError(dispatch, err.data)
+        })
+        .finally(() => {
+            dispatch(changeStatusAC('idle'))
         })
 }
+
+
