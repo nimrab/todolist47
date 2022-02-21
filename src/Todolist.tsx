@@ -78,7 +78,7 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
                         changeTitle={changeTitle}
                     />
 
-                    <IconButton onClick={removeTodolist}>
+                    <IconButton onClick={removeTodolist} disabled={todoList.loadingStatus==='loading'}>
                         <Delete/>
                     </IconButton>
                 </Typography>
@@ -96,6 +96,7 @@ const Todolist: React.FC<TodolistPropsType> = React.memo(({todoList}: TodolistPr
                                 key={el.id}
                                 task={el}
                                 todoListId={todoList.id}
+                                todoListLoadingStatus={todoList.loadingStatus}
                             />)
                     })}
 

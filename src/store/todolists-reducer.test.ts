@@ -1,5 +1,5 @@
 import {
-    addTodoListAC, changeTodoListFilterAC,
+    addTodoListAC, changeLoadingStatusAC, changeTodoListFilterAC,
     changeTodoListTitleAC,
     removeTodoListAC, TodolistDomainType,
     todolistsReducer
@@ -18,8 +18,8 @@ beforeEach(() => {
     todolistId2 = v1();
 
     startState = [
-        {id: todolistId1, title: "What to learn", filter: "all"},
-        {id: todolistId2, title: "What to buy", filter: "all"}
+        {id: todolistId1, title: "What to learn", filter: "all", loadingStatus:"idle"},
+        {id: todolistId2, title: "What to buy", filter: "all", loadingStatus:"idle"}
     ]
 })
 
@@ -40,8 +40,8 @@ test('correct todolist should be added', () => {
     let newTodolistId = v1()
 
     const startState: Array<TodolistDomainType> = [
-        {id: todolistId1, title: "What to learn", filter: "all"},
-        {id: todolistId2, title: "What to buy", filter: "all"}
+        {id: todolistId1, title: "What to learn", filter: "all", loadingStatus:"idle"},
+        {id: todolistId2, title: "What to buy", filter: "all", loadingStatus:"idle"}
     ]
 
     const endState = todolistsReducer(startState, addTodoListAC(newTodolistTitle, newTodolistId))
@@ -72,3 +72,9 @@ test('correct filter of todolist should be changed', () => {
 
 
 
+test('loading status of todolist should be changed', () => {
+    const endState = todolistsReducer(startState, changeLoadingStatusAC(todolistId1, 'loading'));
+
+    expect(endState[0].loadingStatus).toBe('loading');
+    expect(endState[1].loadingStatus).toBe('idle');
+})

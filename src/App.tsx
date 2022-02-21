@@ -79,7 +79,7 @@ function App() {
             <Container fixed={true} style={{marginTop: '75px'}}>
                 <Grid container style={{padding: '29px 0'}}>
                     <div className={'add_todolist_input'}>
-                        <AddItemForm addItem={addTodolist}/>
+                        <AddItemForm addItem={addTodolist} status={status}/>
                     </div>
 
                 </Grid>

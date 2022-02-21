@@ -1,9 +1,9 @@
 import {TaskStateType} from "../App";
-import {AddTodoListAT, RemoveTodoListAT, statusCode} from "./todolists-reducer";
+import {AddTodoListAT, changeLoadingStatusAC, RemoveTodoListAT, statusCode} from "./todolists-reducer";
 import {Dispatch} from "redux";
 import {taskApi} from "../api/task-api";
 import {changeStatusAC} from "./app-reducer";
-import {handleServerAppError} from "../utils/error-utils";
+import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
 
 
 export type ActionType =
@@ -152,7 +152,7 @@ export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
             })
         })
         .catch(err => {
-            handleServerAppError(dispatch, err.data)
+            handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
             dispatch(changeStatusAC('idle'))
@@ -162,6 +162,7 @@ export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
 
 export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispatch) => {
     dispatch(changeStatusAC('loading'))
+    dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.addTask(todoListId, title)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
@@ -171,15 +172,17 @@ export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispa
             }
         })
         .catch(err => {
-            handleServerAppError(dispatch, err.data)
+            handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
             dispatch(changeStatusAC('idle'))
+            dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
 export const changeTaskTitleTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
     dispatch(changeStatusAC('loading'))
+    dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
@@ -189,15 +192,17 @@ export const changeTaskTitleTC = (todoListId: string, taskId: string, title: str
             }
         })
         .catch(err => {
-            handleServerAppError(dispatch, err.data)
+            handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
             dispatch(changeStatusAC('idle'))
+            dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
 export const changeTaskStatusTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
     dispatch(changeStatusAC('loading'))
+    dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
@@ -207,15 +212,17 @@ export const changeTaskStatusTC = (todoListId: string, taskId: string, title: st
             }
         })
         .catch(err => {
-            handleServerAppError(dispatch, err.data)
+            handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
             dispatch(changeStatusAC('idle'))
+            dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
-export const removeTaskStatusTC = (taskId: string, todoListId: string,) => (dispatch: Dispatch) => {
+export const removeTaskTC = (todoListId: string, taskId: string) => (dispatch: Dispatch) => {
     dispatch(changeStatusAC('loading'))
+    dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.deleteTask(todoListId, taskId)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
@@ -225,9 +232,10 @@ export const removeTaskStatusTC = (taskId: string, todoListId: string,) => (disp
             }
         })
         .catch(err => {
-            handleServerAppError(dispatch, err.data)
+            handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
             dispatch(changeStatusAC('idle'))
+            dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }

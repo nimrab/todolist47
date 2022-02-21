@@ -1,13 +1,15 @@
 import React, {ChangeEvent} from 'react';
 import {Checkbox, IconButton, ListItem} from "@material-ui/core";
-import {changeTaskStatusTC, changeTaskTitleTC, removeTaskStatusTC} from "./store/tasks-reducer";
+import {changeTaskStatusTC, changeTaskTitleTC, removeTaskTC} from "./store/tasks-reducer";
 import {EditableSpan} from "./EditableSpan/EditableSpan";
 import {Delete} from "@material-ui/icons";
 import {TaskType} from "./App";
 import {useDispatch} from "react-redux";
+import {RequestStatusType} from "./store/app-reducer";
 
 type TaskPropsType = {
     todoListId: string
+    todoListLoadingStatus: RequestStatusType
     task: TaskType
 }
 
@@ -27,7 +29,7 @@ export const Task = React.memo((props: TaskPropsType) => {
         dispatch(changeTaskStatusTC(todoListId, task.id, task.title, isDone))
     }
     const removeTask = (taskId: string, todoListId: string) => {
-        dispatch(removeTaskStatusTC(todoListId, task.id))
+        dispatch(removeTaskTC(todoListId, task.id))
     }
 
 
@@ -41,6 +43,7 @@ export const Task = React.memo((props: TaskPropsType) => {
                 color={'primary'}
                 checked={task.isDone}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => changeTaskStatus(event.currentTarget.checked)}
+                disabled={props.todoListLoadingStatus==='loading'}
             />
 
 
@@ -50,7 +53,7 @@ export const Task = React.memo((props: TaskPropsType) => {
             />
 
 
-            <IconButton onClick={() => removeTask(task.id, todoListId)}>
+            <IconButton onClick={() => removeTask(task.id, todoListId)} disabled={props.todoListLoadingStatus==='loading'}>
                 <Delete fontSize={'small'}/>
             </IconButton>
 
