@@ -47,11 +47,11 @@ export const Task = React.memo((props: TaskPropsType) => {
             />
 
 
+
             <EditableSpan
                 title={task.title}
                 changeTitle={changeTaskTitle}
             />
-
 
             <IconButton onClick={() => removeTask(task.id, todoListId)} disabled={props.todoListLoadingStatus==='loading'}>
                 <Delete fontSize={'small'}/>

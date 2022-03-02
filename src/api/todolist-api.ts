@@ -42,6 +42,6 @@ type TodoType = {
 export type ResponseType<T> = {
     resultCode: number
     messages: string[]
-    fieldsErrors: string[]
+    fieldsErrors?: string[]
     data: T
 }

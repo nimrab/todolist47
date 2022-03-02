@@ -1,18 +1,26 @@
 import {TaskStateType} from "../App";
-import {AddTodoListAT, changeLoadingStatusAC, RemoveTodoListAT, statusCode} from "./todolists-reducer";
+import {
+    AddTodoListAT,
+    changeLoadingStatusAC,
+    ChangeTodoListStatusAT,
+    RemoveTodoListAT,
+    statusCode
+} from "./todolists-reducer";
 import {Dispatch} from "redux";
 import {taskApi} from "../api/task-api";
-import {changeStatusAC} from "./app-reducer";
+import {changeAppStatusAC, ChangeAppStatusAT} from "./app-reducer";
 import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
 
 
-export type ActionType =
+export type TasksActionType =
     RemoveTaskACType
     | AddTaskACType
     | ChangeTaskStatusACType
     | ChangeTaskTitleACType
     | AddTodoListAT
     | RemoveTodoListAT
+    | ChangeAppStatusAT
+    | ChangeTodoListStatusAT
 
 
 const initialState: TaskStateType = {
@@ -34,7 +42,7 @@ const initialState: TaskStateType = {
 }
 
 
-export const taskReducer = (state: TaskStateType = initialState, action: ActionType): TaskStateType => {
+export const taskReducer = (state: TaskStateType = initialState, action: TasksActionType): TaskStateType => {
 
     switch (action.type) {
 
@@ -143,7 +151,7 @@ export const changeTaskTitleAC = (taskId: string, taskTitle: string, todoListId:
 }
 
 export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
-    dispatch(changeStatusAC('loading'))
+    dispatch(changeAppStatusAC('loading'))
     taskApi.getTasks(todoListId)
         .then(res => {
             res.data.items.forEach(el => {
@@ -155,13 +163,13 @@ export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
             handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
-            dispatch(changeStatusAC('idle'))
+            dispatch(changeAppStatusAC('idle'))
         })
 }
 
 
 export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispatch) => {
-    dispatch(changeStatusAC('loading'))
+    dispatch(changeAppStatusAC('loading'))
     dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.addTask(todoListId, title)
         .then(res => {
@@ -175,13 +183,13 @@ export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispa
             handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
-            dispatch(changeStatusAC('idle'))
+            dispatch(changeAppStatusAC('idle'))
             dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
 export const changeTaskTitleTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
-    dispatch(changeStatusAC('loading'))
+    dispatch(changeAppStatusAC('loading'))
     dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
         .then(res => {
@@ -195,13 +203,13 @@ export const changeTaskTitleTC = (todoListId: string, taskId: string, title: str
             handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
-            dispatch(changeStatusAC('idle'))
+            dispatch(changeAppStatusAC('idle'))
             dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
 export const changeTaskStatusTC = (todoListId: string, taskId: string, title: string, taskStatus: boolean) => (dispatch: Dispatch) => {
-    dispatch(changeStatusAC('loading'))
+    dispatch(changeAppStatusAC('loading'))
     dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.editTaskTitleOrStatus(todoListId, taskId, title, taskStatus)
         .then(res => {
@@ -215,13 +223,13 @@ export const changeTaskStatusTC = (todoListId: string, taskId: string, title: st
             handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
-            dispatch(changeStatusAC('idle'))
+            dispatch(changeAppStatusAC('idle'))
             dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
 export const removeTaskTC = (todoListId: string, taskId: string) => (dispatch: Dispatch) => {
-    dispatch(changeStatusAC('loading'))
+    dispatch(changeAppStatusAC('loading'))
     dispatch(changeLoadingStatusAC(todoListId, 'loading'))
     taskApi.deleteTask(todoListId, taskId)
         .then(res => {
@@ -235,7 +243,7 @@ export const removeTaskTC = (todoListId: string, taskId: string) => (dispatch: D
             handleServerNetworkError(dispatch, err.message)
         })
         .finally(() => {
-            dispatch(changeStatusAC('idle'))
+            dispatch(changeAppStatusAC('idle'))
             dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }

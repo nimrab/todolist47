@@ -1,14 +1,23 @@
 import {Dispatch} from "redux";
-import {AppActionsType, changeStatusAC, setAppErrorAC} from "../store/app-reducer";
+import {AppActionsType, changeAppStatusAC, setAppErrorAC} from "../store/app-reducer";
 import {ResponseType} from '../api/todolist-api'
+import {AuthActionsType} from "../store/auth-reducer";
+import {TasksActionType} from "../store/tasks-reducer";
+import {TodoListsActionType} from "../store/todolists-reducer";
 
 
-export const handleServerNetworkError = (dispatch: Dispatch<AppActionsType>, message: string) => {
+type HandleErrorType =
+    | AppActionsType
+    | AuthActionsType
+    | TasksActionType
+    | TodoListsActionType
+
+export const handleServerNetworkError = (dispatch: Dispatch<HandleErrorType>, message: string) => {
     dispatch(setAppErrorAC(message))
 }
 
 
-export const handleServerAppError = <T>(dispatch: Dispatch<AppActionsType>, data: ResponseType<T>) => {
+export const handleServerAppError = <T>(dispatch: Dispatch<HandleErrorType>, data: ResponseType<T>) => {
     if (data.messages.length) {
         dispatch(setAppErrorAC(data.messages[0]))
     } else {
