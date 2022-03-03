@@ -1,58 +1,36 @@
-import {FilterValuesType, TodolistType} from "../App";
-import {Dispatch} from "redux";
-import {todolistApi} from "../api/todolist-api";
-import {changeAppStatusAC, RequestStatusType} from "./app-reducer";
-import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
+import {Dispatch} from 'redux'
+import {todoListApi} from '../api/todoList-api'
+import {changeAppStatusAC, RequestStatusType} from './app-reducer'
+import {handleServerAppError, handleServerNetworkError} from '../utils/error-utils'
+import {FilterValuesType, TodolistType} from "../app/App";
 
 export type RemoveTodoListAT = {
     type: 'REMOVE-TODOLIST'
     todoListId: string
 }
-
 export type AddTodoListAT = {
     type: 'ADD-TODOLIST'
     title: string
     todoListId: string
 }
-
 type ChangeTodoListTitleAT = {
     type: 'CHANGE-TODOLIST-TITLE'
     title: string
     id: string
 }
-
 type ChangeTodoListFilterAT = {
     type: 'CHANGE-TODOLIST-FILTER'
     filter: FilterValuesType
     id: string
 }
-
-
 export type ChangeTodoListStatusAT = {
     type: 'CHANGE-TODOLIST-STATUS'
     id: string
     status: RequestStatusType
 }
+type setTodoListsAT = ReturnType<typeof setTodoListsAC>
 
-
-/*
-export const todolistId_1 = v1()
-export const todolistId_2 = v1()
-*/
-
-
-const initialState: Array<TodolistDomainType> = [
-    /*{id: todolistId_1, title: 'What to learn', filter: 'all'},
-    {id: todolistId_2, title: 'What to eat', filter: 'all'},*/
-]
-
-
-export const statusCode = {
-    success: 0,
-    error: 1
-}
-
-export type TodolistDomainType = TodolistType & {
+export type TodoListDomainType = TodolistType & {
     filter: FilterValuesType
     loadingStatus: RequestStatusType
 }
@@ -63,22 +41,38 @@ export type TodoListsActionType =
     | ChangeTodoListTitleAT
     | ChangeTodoListFilterAT
     | ChangeTodoListStatusAT
+    | setTodoListsAT
 
-export const todolistsReducer = (todoLists: Array<TodolistDomainType> = initialState, action: TodoListsActionType): Array<TodolistDomainType> => {
+const initialState: Array<TodoListDomainType> = []
+
+
+export const statusCode = {
+    success: 0,
+    error: 1
+}
+
+export const todoListsReducer = (todoLists: Array<TodoListDomainType> = initialState, action: TodoListsActionType): Array<TodoListDomainType> => {
 
     switch (action.type) {
+        case "SET-TODOLISTS":
+            return action.data.map(el => ({
+                id: el.id,
+                title: el.title,
+                filter: 'all',
+                loadingStatus: 'idle'
+            }))
 
         case 'REMOVE-TODOLIST':
             return todoLists.filter(el => el.id !== action.todoListId)
 
         case 'ADD-TODOLIST':
-            const newTodoList: TodolistDomainType = {
+            const newTodoList: TodoListDomainType = {
                 id: action.todoListId,
                 title: action.title,
                 filter: 'all',
                 loadingStatus: 'idle'
             }
-            return [...todoLists, newTodoList]
+            return [newTodoList, ...todoLists]
 
         case 'CHANGE-TODOLIST-TITLE':
             return todoLists.map(el => el.id === action.id ? {...el, title: action.title} : el)
@@ -94,7 +88,7 @@ export const todolistsReducer = (todoLists: Array<TodolistDomainType> = initialS
     }
 }
 
-
+//AC
 export const changeLoadingStatusAC = (id: string, status: RequestStatusType) => {
     return {
         type: 'CHANGE-TODOLIST-STATUS',
@@ -134,13 +128,21 @@ export const changeTodoListFilterAC = (filter: FilterValuesType, id: string): Ch
     } as const
 }
 
+export const setTodoListsAC = (data: TodolistType[]) => {
+    return {
+        type: 'SET-TODOLISTS',
+        data
+    } as const
+}
+
+
+//TC
 export const getTodoListTC = () => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
-    todolistApi.getTodos()
+    todoListApi.getTodos()
         .then(res => {
-            res.data.reverse().forEach(el => {
-                dispatch(addTodoListAC(el.title, el.id))
-            })
+            dispatch(setTodoListsAC(res.data))
+            // setTodoListsAC(res.data)
         })
         .catch(err => {
             handleServerAppError(dispatch, err.data)
@@ -152,7 +154,7 @@ export const getTodoListTC = () => (dispatch: Dispatch) => {
 
 export const addTodoListTC = (title: string) => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
-    todolistApi.createTodo(title)
+    todoListApi.createTodo(title)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
                 dispatch(addTodoListAC(title, res.data.data.item.id))
@@ -170,8 +172,8 @@ export const addTodoListTC = (title: string) => (dispatch: Dispatch) => {
 
 export const changeTodoListTitleTC = (title: string, todoListId: string) => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
-    dispatch(changeLoadingStatusAC(todoListId,'loading'))
-    todolistApi.editTodo(title, todoListId)
+    dispatch(changeLoadingStatusAC(todoListId, 'loading'))
+    todoListApi.editTodo(title, todoListId)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
                 dispatch(changeTodoListTitleAC(title, todoListId))
@@ -184,14 +186,14 @@ export const changeTodoListTitleTC = (title: string, todoListId: string) => (dis
         })
         .finally(() => {
             dispatch(changeAppStatusAC('idle'))
-            dispatch(changeLoadingStatusAC(todoListId,'idle'))
+            dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 
 export const deleteTodoListTC = (todoListId: string) => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
-    dispatch(changeLoadingStatusAC(todoListId,'loading'))
-    todolistApi.deleteTodo(todoListId)
+    dispatch(changeLoadingStatusAC(todoListId, 'loading'))
+    todoListApi.deleteTodo(todoListId)
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
                 dispatch(removeTodoListAC(todoListId))
@@ -204,7 +206,7 @@ export const deleteTodoListTC = (todoListId: string) => (dispatch: Dispatch) => 
         })
         .finally(() => {
             dispatch(changeAppStatusAC('idle'))
-            dispatch(changeLoadingStatusAC(todoListId,'idle'))
+            dispatch(changeLoadingStatusAC(todoListId, 'idle'))
         })
 }
 

@@ -1,17 +1,14 @@
 import React from 'react'
-import Grid from '@mui/material/Grid'
 import Checkbox from '@mui/material/Checkbox'
-import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormGroup from '@mui/material/FormGroup'
-import FormLabel from '@mui/material/FormLabel'
 import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
 import {useFormik} from 'formik'
-import {loginTC} from "../../store/auth-reducer";
-import {useDispatch, useSelector} from "react-redux";
-import {AppRootStateType} from "../../store/store";
-import { Navigate } from 'react-router-dom'
+import {loginTC} from '../../store/auth-reducer'
+import {useDispatch, useSelector} from 'react-redux'
+import {AppRootStateType} from '../../store/store'
+import {Navigate} from 'react-router-dom'
+import {Button, Grid, FormControl, FormLabel} from '@material-ui/core'
 
 type FormikErrorType = {
     email?: string
@@ -19,11 +16,10 @@ type FormikErrorType = {
     rememberMe?: boolean
 }
 
-
 export const Login = () => {
+
     const dispatch = useDispatch()
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
-    const initialize = useSelector<AppRootStateType, boolean>(state => state.app.initialize)
 
 
     const formik = useFormik({
@@ -44,8 +40,6 @@ export const Login = () => {
             } else if (values.password.length < 6) {
                 errors.password = 'Password is minimum 6 symbols required'
             }
-
-
             return errors;
         },
         onSubmit: values => {
@@ -59,10 +53,10 @@ export const Login = () => {
     }
 
     return <Grid container justifyContent={'center'}>
-        <Grid item justifyContent={'center'}>
+        <Grid item>
             <form onSubmit={formik.handleSubmit}>
                 <FormControl>
-                    <FormLabel>
+                    <FormLabel style={{marginTop: '10px'}}>
                         <p>Test email: <b>nimrab.0@gmail.com</b></p>
                         <p>Test password: <b>nimrab</b></p>
                     </FormLabel>
@@ -74,7 +68,9 @@ export const Login = () => {
                             onBlur={formik.handleBlur}
                         />
                         {formik.touched.email && formik.errors.email &&
+
                         <div style={{color: 'red'}}>{formik.errors.email}</div>}
+
                         <TextField
                             type='password'
                             label='Password'
@@ -82,14 +78,21 @@ export const Login = () => {
                             {...formik.getFieldProps('password')}
                             onBlur={formik.handleBlur}
                         />
+
                         {formik.touched.password && formik.errors.password &&
-                        <div style={{color: 'red'}}>{formik.errors.password}</div>}
+                        <div style={{color: 'red', margin: '5px 0 10px 0'}}>{formik.errors.password}</div>}
+
                         <FormControlLabel
                             label={'Remember me'}
                             control={<Checkbox/>}
                             {...formik.getFieldProps('rememberMe')}
+                            style={{marginLeft: '0px'}}
                         />
-                        <Button type={'submit'} variant={'contained'} color={'primary'}>
+                        <Button
+                            type={'submit'}
+                            variant={'contained'}
+                            color={'primary'}
+                            style={{marginTop: '20px'}}>
                             Login
                         </Button>
                     </FormGroup>

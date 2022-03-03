@@ -1,4 +1,4 @@
-import {authReducer, InitialStateType, setIsLoggedInAC} from "./auth-reducer";
+import {authReducer, InitialStateType, setIsLoggedInAC} from './auth-reducer'
 
 let startState: InitialStateType
 

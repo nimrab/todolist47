@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {ResponseType} from '../api/todolist-api'
+import {ResponseType} from './todoList-api'
 
 
 const instance = axios.create({
@@ -40,10 +40,9 @@ type TaskType = {
     error: string | null
 }
 
-type ItemType = {
+export type ItemType = {
     description: string | null
     title: string
-    completed: boolean
     status: number
     priority: number
     startDate: string | null

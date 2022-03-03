@@ -1,6 +1,6 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from "react";
-import {IconButton, TextField} from "@material-ui/core";
-import {Edit} from "@material-ui/icons";
+import React, {ChangeEvent, KeyboardEvent, useState} from 'react'
+import {IconButton, TextField} from '@material-ui/core'
+import {Edit} from '@material-ui/icons'
 
 export type EditableSpanPropsType = {
     title: string
@@ -43,12 +43,6 @@ export const EditableSpan = React.memo((props: EditableSpanPropsType) => {
 
                 style={{width:'120px'}}
                 />
-            // <input
-            //     value={title}
-            //     onBlur={offEditMode}
-            //     autoFocus={true}
-            //     onChange={changeTitleByButton}
-            // />
             : <span
                 onDoubleClick={onEditMode}
             >
@@ -58,5 +52,4 @@ export const EditableSpan = React.memo((props: EditableSpanPropsType) => {
                 </IconButton>
         </span>
     )
-
 })

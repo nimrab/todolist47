@@ -1,16 +1,41 @@
-import {TaskStateType} from "../App";
 import {
     AddTodoListAT,
     changeLoadingStatusAC,
     ChangeTodoListStatusAT,
     RemoveTodoListAT,
     statusCode
-} from "./todolists-reducer";
-import {Dispatch} from "redux";
-import {taskApi} from "../api/task-api";
-import {changeAppStatusAC, ChangeAppStatusAT} from "./app-reducer";
-import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
+} from './todoLists-reducer'
+import {Dispatch} from 'redux'
+import {ItemType, taskApi} from '../api/task-api'
+import {changeAppStatusAC, ChangeAppStatusAT} from './app-reducer'
+import {handleServerAppError, handleServerNetworkError} from '../utils/error-utils'
+import {TaskStateType} from '../app/App'
 
+type RemoveTaskACType = {
+    type: 'REMOVE-TASK'
+    taskId: string
+    todoListId: string
+}
+type AddTaskACType = {
+    type: 'ADD-TASK'
+    taskId: string
+    taskTitle: string
+    todoListId: string
+    isDone: boolean
+}
+type ChangeTaskStatusACType = {
+    type: 'CHANGE-TASK-STATUS'
+    taskId: string
+    isDone: boolean
+    todoListId: string
+}
+type ChangeTaskTitleACType = {
+    type: 'CHANGE-TASK-TITLE'
+    taskId: string
+    taskTitle: string
+    todoListId: string
+}
+type setTasksAT = ReturnType<typeof setTasksAC>
 
 export type TasksActionType =
     RemoveTaskACType
@@ -21,30 +46,28 @@ export type TasksActionType =
     | RemoveTodoListAT
     | ChangeAppStatusAT
     | ChangeTodoListStatusAT
+    | setTasksAT
 
 
 const initialState: TaskStateType = {
     /*  [todolistId_1]: [
           {id: v1(), title: "HTML", isDone: true},
           {id: v1(), title: "CSS", isDone: false},
-          {id: v1(), title: "JS", isDone: false},
-          {id: v1(), title: "React", isDone: true},
-          {id: v1(), title: "TypeScript", isDone: true},
-          {id: v1(), title: "GraphQL", isDone: false},
       ],
       [todolistId_2]: [
           {id: v1(), title: "Meat", isDone: true},
           {id: v1(), title: "Pasta", isDone: true},
-          {id: v1(), title: "Coca-Cola", isDone: false},
-          {id: v1(), title: "Whiskey", isDone: true},
-          {id: v1(), title: "Bread", isDone: false},
       ],*/
 }
-
 
 export const taskReducer = (state: TaskStateType = initialState, action: TasksActionType): TaskStateType => {
 
     switch (action.type) {
+        case 'SET-TASKS':
+            const newTaskArr = action.tasks.map((el: ItemType) => {
+                return ({id: el.id, title: el.title, isDone: el.status === 1})
+            })
+            return {...state, [action.todoListId]: newTaskArr}
 
         case 'REMOVE-TASK':
             return {...state, [action.todoListId]: state[action.todoListId].filter(el => el.id !== action.taskId)}
@@ -83,37 +106,10 @@ export const taskReducer = (state: TaskStateType = initialState, action: TasksAc
         default:
             return state
     }
-
 }
 
-type RemoveTaskACType = {
-    type: 'REMOVE-TASK'
-    taskId: string
-    todoListId: string
-}
 
-type AddTaskACType = {
-    type: 'ADD-TASK'
-    taskId: string
-    taskTitle: string
-    todoListId: string
-    isDone: boolean
-}
-
-type ChangeTaskStatusACType = {
-    type: 'CHANGE-TASK-STATUS'
-    taskId: string
-    isDone: boolean
-    todoListId: string
-}
-
-type ChangeTaskTitleACType = {
-    type: 'CHANGE-TASK-TITLE'
-    taskId: string
-    taskTitle: string
-    todoListId: string
-}
-
+//AC
 export const removeTaskAC = (taskId: string, todoListId: string): RemoveTaskACType => {
     return {
         type: 'REMOVE-TASK',
@@ -150,14 +146,21 @@ export const changeTaskTitleAC = (taskId: string, taskTitle: string, todoListId:
     }
 }
 
+
+export const setTasksAC = (todoListId: string, tasks: Array<ItemType>) => {
+    return {
+        type: 'SET-TASKS',
+        todoListId,
+        tasks
+    } as const
+}
+
+//TC
 export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
     taskApi.getTasks(todoListId)
         .then(res => {
-            res.data.items.forEach(el => {
-                const status = !!el.status
-                dispatch(addTaskAC(el.title, todoListId, el.id, status))
-            })
+            dispatch(setTasksAC(todoListId, res.data.items))
         })
         .catch(err => {
             handleServerNetworkError(dispatch, err.message)
@@ -166,7 +169,6 @@ export const getTasksTC = (todoListId: string) => (dispatch: Dispatch) => {
             dispatch(changeAppStatusAC('idle'))
         })
 }
-
 
 export const addTaskTC = (todoListId: string, title: string) => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))

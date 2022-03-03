@@ -1,24 +1,25 @@
-import {Dispatch} from "redux";
-import {authApi} from "../api/auth-api";
-import {statusCode} from "./todolists-reducer";
-import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
-import {setIsLoggedInAC} from "./auth-reducer";
+import {Dispatch} from 'redux'
+import {authApi} from '../api/auth-api'
+import {statusCode} from './todoLists-reducer'
+import {setIsLoggedInAC} from './auth-reducer'
 
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed'
+export type ChangeAppStatusAT = ReturnType<typeof changeAppStatusAC>
+export type SetAppErrorAT = ReturnType<typeof setAppErrorAC>
+export type setAppInitializeAT = ReturnType<typeof setAppInitializeAC>
 
 export type AppActionsType =
     | ChangeAppStatusAT
     | SetAppErrorAT
     | setAppInitializeAT
 
-
 const initialState = {
     status: 'idle' as RequestStatusType,
     error: null as string | null,
-    initialize: false
+    isInitialized: false
 }
 
-type InitialStateType = typeof initialState
+export type InitialStateType = typeof initialState
 
 export const appReducer = (state: InitialStateType = initialState, action: AppActionsType): InitialStateType => {
     switch (action.type) {
@@ -29,7 +30,7 @@ export const appReducer = (state: InitialStateType = initialState, action: AppAc
             return {...state, error: action.error}
 
         case 'APP/SET-INITIALIZE':
-            return {...state, initialize: action.value}
+            return {...state, isInitialized: action.value}
 
         default:
             return state
@@ -37,17 +38,13 @@ export const appReducer = (state: InitialStateType = initialState, action: AppAc
 }
 
 
-export type ChangeAppStatusAT = ReturnType<typeof changeAppStatusAC>
-export type SetAppErrorAT = ReturnType<typeof setAppErrorAC>
-export type setAppInitializeAT = ReturnType<typeof setAppInitializeAC>
-
+//AC
 export const changeAppStatusAC = (status: RequestStatusType) => {
     return {
         type: 'APP/SET-STATUS',
         status
     } as const
 }
-
 
 export const setAppErrorAC = (error: string | null) => {
     return {
@@ -63,27 +60,20 @@ export const setAppInitializeAC = (value: boolean) => {
     } as const
 }
 
-//thunks
 
 
-export const initializeAppTC = () => (dispatch: Dispatch) => {
+//TC
+export const appInitializeTC = () => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
 
     authApi.me()
         .then(res => {
             if (res.data.resultCode === statusCode.success) {
                 dispatch(setIsLoggedInAC(true))
-            } else {
-                handleServerAppError(dispatch, res.data)
-            }
-        })
-        .catch(err => {
-            handleServerNetworkError(dispatch, err.message)
-        })
+            }})
         .finally(() => {
-            dispatch(changeAppStatusAC('idle'))
             dispatch(setAppInitializeAC(true))
+            dispatch(changeAppStatusAC('idle'))
         })
-
 }
 

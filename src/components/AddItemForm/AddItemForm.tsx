@@ -1,7 +1,8 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from "react";
-import {IconButton, TextField} from "@material-ui/core";
-import AddBoxIcon from "@material-ui/icons/AddBox";
-import {RequestStatusType} from "../store/app-reducer";
+import React, {ChangeEvent, KeyboardEvent, useState} from 'react'
+import {IconButton, TextField} from '@material-ui/core'
+import AddBoxIcon from '@material-ui/icons/AddBox'
+import {RequestStatusType} from '../../store/app-reducer'
+import css from './AddItemForm.module.css'
 
 
 export type AddItemFormPropsType = {
@@ -14,7 +15,6 @@ export const AddItemForm = React.memo(
         console.log('AddItemForm rendered')
         const [title, setTitle] = useState<string>("")
         const [error, setError] = useState<boolean>(false)
-
 
         const changeTitleByButton = (event: ChangeEvent<HTMLInputElement>) => {
             setError(false)
@@ -30,24 +30,18 @@ export const AddItemForm = React.memo(
         const addItemFn = () => {
             const trimTitle = title.trim()
             if (trimTitle) {
-                props.addItem(trimTitle) //не даем пустую строку
-                setTitle("") //обнуляем поле ввода после энтера
+                props.addItem(trimTitle)
             } else {
                 setError(true)
             }
             setTitle("")
         }
-
-
         const errorMessage = error
-            ? <div style={{color: "red"}}>Title is required!</div>
+            ? <div style={{color: 'red'}}>Title is required!</div>
             : null
 
-
         return (
-
-            <div className={'input_field'}>
-
+            <div className={css.input_field}>
                 <TextField
                     variant={'outlined'}
                     size={'small'}
@@ -57,14 +51,10 @@ export const AddItemForm = React.memo(
                     onKeyPress={changeTitleByEnter}
                     error={!!error}
                 />
-
                 <IconButton onClick={addItemFn} disabled={props.status === 'loading'}>
                     <AddBoxIcon fontSize={'large'}></AddBoxIcon>
                 </IconButton>
                 {errorMessage}
-
-
             </div>
-
         )
     })

@@ -1,9 +1,9 @@
 import {Dispatch} from "redux";
 import {AppActionsType, changeAppStatusAC, setAppErrorAC} from "../store/app-reducer";
-import {ResponseType} from '../api/todolist-api'
+import {ResponseType} from '../api/todoList-api'
 import {AuthActionsType} from "../store/auth-reducer";
 import {TasksActionType} from "../store/tasks-reducer";
-import {TodoListsActionType} from "../store/todolists-reducer";
+import {TodoListsActionType} from "../store/todoLists-reducer";
 
 
 type HandleErrorType =

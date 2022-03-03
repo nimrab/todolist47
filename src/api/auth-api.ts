@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {ResponseType} from '../api/todolist-api'
+import {ResponseType} from './todoList-api'
 
 
 const instance = axios.create({
@@ -19,8 +19,11 @@ export const authApi = {
 
     me() {
         return instance.get<ResponseType<AuthMeResponseDataType>>(`me`)
-    }
+    },
 
+    logout() {
+        return instance.delete<ResponseType<{}>>(`login`)
+    }
 
 }
 

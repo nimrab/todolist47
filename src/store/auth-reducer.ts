@@ -1,13 +1,12 @@
 import {Dispatch} from 'redux'
 import {changeAppStatusAC, ChangeAppStatusAT} from './app-reducer'
 import {authApi, LoginParamsType} from '../api/auth-api'
-import {statusCode} from './todolists-reducer'
+import {statusCode} from './todoLists-reducer'
 import {handleServerAppError, handleServerNetworkError} from '../utils/error-utils'
 
 
 const initialState = {
     isLoggedIn: false
-
 }
 
 export type InitialStateType = typeof initialState
@@ -19,29 +18,28 @@ export type AuthActionsType =
 
 export const authReducer = (state: InitialStateType = initialState, action: AuthActionsType): InitialStateType => {
     switch (action.type) {
-        case 'login/SET-IS-LOGGED-IN':
+        case 'LOGIN/SET-IS-LOGGED-IN':
             return {...state, isLoggedIn: action.value}
+
         default:
             return state
     }
 }
 
-
-
-
-
+//AC
 export const setIsLoggedInAC = (value: boolean) => {
     return {
-        type: 'login/SET-IS-LOGGED-IN',
+        type: 'LOGIN/SET-IS-LOGGED-IN',
         value
     } as const
 }
 
-// thunk
+
+// TC
 export const loginTC = (formData: LoginParamsType) => (dispatch: Dispatch) => {
     dispatch(changeAppStatusAC('loading'))
     authApi.login(formData)
-        .then (res => {
+        .then(res => {
             if (res.data.resultCode === statusCode.success) {
                 dispatch(setIsLoggedInAC(true))
             } else {
@@ -55,5 +53,23 @@ export const loginTC = (formData: LoginParamsType) => (dispatch: Dispatch) => {
             dispatch(changeAppStatusAC('idle'))
         })
 
+}
+
+export const logoutTC = () => (dispatch: Dispatch) => {
+    dispatch(changeAppStatusAC('loading'))
+    authApi.logout()
+        .then(res => {
+            if (res.data.resultCode === statusCode.success) {
+                dispatch(setIsLoggedInAC(false))
+            } else {
+                handleServerAppError(dispatch, res.data)
+            }
+        })
+        .catch(err => {
+            handleServerNetworkError(dispatch, err.message)
+        })
+        .finally(() => {
+            dispatch(changeAppStatusAC('idle'))
+        })
 }
 
