@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect} from 'react'
 import {AppBar, Button, Container, Grid, Toolbar, Typography} from '@material-ui/core'
-import {useDispatch, useSelector} from "react-redux"
+import {useDispatch, useSelector} from 'react-redux'
 import {AppRootStateType} from '../store/store'
 import {ErrorSnackbar} from '../components/ErrorSnackbar/ErrorSnackbar'
 import {appInitializeTC, RequestStatusType} from '../store/app-reducer'
@@ -72,10 +72,11 @@ export const App = () => {
             <Container fixed={true} style={{marginTop: '75px'}}>
                 <Grid container spacing={4}>
                     <Routes>
-                        <Route path='/' element={<TodoLists/>}/>
-                        <Route path='login' element={<Login/>}/>
-                        <Route path='/404' element={<Page404/>}/>
-                        <Route path='*' element={<Navigate to='/404'/>}/>
+                        <Route path='/todolist47' element={<TodoLists/>}/>
+                        <Route path='todolist47/login' element={<Login/>}/>
+                        <Route path='todolist47/404' element={<Page404/>}/>
+                        <Route path='/' element={<Navigate to='/todolist47'/>}/>
+                        <Route path='*' element={<Navigate to='todolist47/404'/>}/>
                     </Routes>
                 </Grid>
             </Container>
