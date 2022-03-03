@@ -29,7 +29,7 @@ export const TodoLists = () => {
 
     if (!isLoggedIn) {
         return (
-            <Navigate to='todolist47/login'/>
+            <Navigate to='/login'/>
         )
     }
 

@@ -72,11 +72,10 @@ export const App = () => {
             <Container fixed={true} style={{marginTop: '75px'}}>
                 <Grid container spacing={4}>
                     <Routes>
-                        <Route path='/todolist47' element={<TodoLists/>}/>
-                        <Route path='todolist47/login' element={<Login/>}/>
-                        <Route path='todolist47/404' element={<Page404/>}/>
-                        <Route path='/' element={<Navigate to='/todolist47'/>}/>
-                        <Route path='*' element={<Navigate to='todolist47/404'/>}/>
+                        <Route path='/' element={<TodoLists/>}/>
+                        <Route path='/login' element={<Login/>}/>
+                        <Route path='/404' element={<Page404/>}/>
+                        <Route path='*' element={<Navigate to='/404'/>}/>
                     </Routes>
                 </Grid>
             </Container>
